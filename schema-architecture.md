@@ -32,11 +32,18 @@ The Presentation Tier handles user interaction and external communication. It su
 Received the request from user interacting with the user interface e.g (clicking a button, submitting a form) based on the url path and http method
 - Server-rendered views handled by MVC Controllers, it uses thymeleaf for returning dynamic HTML.
 - Requests from API consumers handled by REST Controllers, return responses in json format.
+Received the request from user interacting with the user interface e.g (clicking a button, submitting a form) based on the url path and http method
+- Server-rendered views handled by MVC Controllers, it uses thymeleaf for returning dynamic HTML.
+- Requests from API consumers handled by REST Controllers, return responses in json format.
 
 ### 3. Service layer:
 Controllers delegate logic to the services layer to apply business logic, coordinate workflow across the entities, and ensure a clean separation between controller logic and data access.
+Controllers delegate logic to the services layer to apply business logic, coordinate workflow across the entities, and ensure a clean separation between controller logic and data access.
 
 ### 4. Repository layer:
+The service layer communicates with the repository layer to perform data access operations. In our case we have two types of repositories, one for structured and relational data (using MYSQL) and the other for Document-based data (using MongoDB).
+- Spring Data JPA is used for MySQL
+- Spring Data MongoDB is used for MongoDB
 The service layer communicates with the repository layer to perform data access operations. In our case we have two types of repositories, one for structured and relational data (using MYSQL) and the other for Document-based data (using MongoDB).
 - Spring Data JPA is used for MySQL
 - Spring Data MongoDB is used for MongoDB
@@ -45,11 +52,16 @@ The service layer communicates with the repository layer to perform data access 
 Each repository interfaces interact directly with the underlying database engine (MySQL or MongoDB).
 - MySQL (structured data) such as: Patient, Appointment and Doctor
 - MongoDB (unstructured document-base data) such as: prescriptions.
+Each repository interfaces interact directly with the underlying database engine (MySQL or MongoDB).
+- MySQL (structured data) such as: Patient, Appointment and Doctor
+- MongoDB (unstructured document-base data) such as: prescriptions.
 
 ### 6. Model Binding:
 Once data is retrieved from the database is mapped into Java Model Classes. In case of Structured-relational data (MySQL) is mapped into JPA Entities (annotated as @Entity), and for Document-based data (MongoDB) is loaded into document objects (typically annotated @Document), which map to BSON or JSON structures and collections.
+Once data is retrieved from the database is mapped into Java Model Classes. In case of Structured-relational data (MySQL) is mapped into JPA Entities (annotated as @Entity), and for Document-based data (MongoDB) is loaded into document objects (typically annotated @Document), which map to BSON or JSON structures and collections.
 
 ### 7. Application model
+The bound models are used in the response layer, that are passed from the controller to thymeleaf templates for the MVC flows where they are rendered as dynamic HTML for the browser. In REST flows the same model (or DTOs) are serialized into JSON and sent back to the client.
 The bound models are used in the response layer, that are passed from the controller to thymeleaf templates for the MVC flows where they are rendered as dynamic HTML for the browser. In REST flows the same model (or DTOs) are serialized into JSON and sent back to the client.
 
 ## Reference:
@@ -58,3 +70,4 @@ The bound models are used in the response layer, that are passed from the contro
 - [Spring Data Mongo DB](https://spring.io/projects/spring-data-mongodb)
 - [Thymeleaf](https://www.thymeleaf.org/)
 - [REST API Design](https://restfulapi.net/)
+
