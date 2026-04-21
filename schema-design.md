@@ -40,7 +40,7 @@
 | name         | VARCHAR(100)  |  NO         | YES      | NO              |
 | email        | VARCHAR(100)  |  NO         | YES      | NO              |
 | password     | VARCHAR(100)  |  NO         | YES      | NO              |
-| specialty    | VARCHAR(100)  |  NO         | YES      | NO              |
+| specialty    | VARCHAR(50)   |  NO         | YES      | NO              |
 | phone        | VARCHAR(10)   |  NO         | YES      | NO              |
 
 **Indexes**
@@ -88,7 +88,7 @@
 #### Basic definition
 - id: Integer, Primary Key (@Id), Auto Increment
 - doctor_id: integer, ManyToOne (doctor), Not Null
-- patiend_id: integer, ManyToOne (patiend), Not Null
+- patient_id: integer, ManyToOne (patient), Not Null
 - appointment_time: LocalDateTime, Not NUll
 - Status: integer. (0=scheduled, 1=Completed, 2=cancelled)
 
