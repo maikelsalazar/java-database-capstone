@@ -1,15 +1,11 @@
 package com.project.back_end.models;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Document(collection = "prescriptions")
 public class Prescription {
@@ -25,29 +21,34 @@ public class Prescription {
     @Size(min = 3, max = 100)
     private String patientName;
 
-    @Valid
-    @NotEmpty
-    private List<MedicationTime> medications;
+    @NotNull
+    @Size(min = 3, max = 100)
+    private String medication;
+
+    @NotNull
+    @Size(min = 3, max = 20)
+    private String dosage;
 
     @Size(max = 200)
     private String doctorNotes;
 
-    @NotNull
-    private LocalDateTime createdAt = LocalDateTime.now();
-
     public Prescription() {
     }
 
-    public Prescription(Long appointmentId, String patientName,
-                        List<MedicationTime> medications, String doctorNotes) {
+    public Prescription(Long appointmentId, String patientName, String medication, String dosage, String doctorNotes) {
         this.appointmentId = appointmentId;
         this.patientName = patientName;
-        this.medications = List.copyOf(medications);
+        this.medication = medication;
+        this.dosage = dosage;
         this.doctorNotes = doctorNotes;
     }
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Long getAppointmentId() {
@@ -66,12 +67,20 @@ public class Prescription {
         this.patientName = patientName;
     }
 
-    public List<MedicationTime> getMedications() {
-        return medications;
+    public String getMedication() {
+        return medication;
     }
 
-    public void setMedications(List<MedicationTime> medications) {
-        this.medications = medications;
+    public void setMedication(String medication) {
+        this.medication = medication;
+    }
+
+    public String getDosage() {
+        return dosage;
+    }
+
+    public void setDosage(String dosage) {
+        this.dosage = dosage;
     }
 
     public String getDoctorNotes() {
@@ -80,9 +89,5 @@ public class Prescription {
 
     public void setDoctorNotes(String doctorNotes) {
         this.doctorNotes = doctorNotes;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
     }
 }

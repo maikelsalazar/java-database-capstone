@@ -15,7 +15,6 @@
 | id           | INT           |  YES        | YES       | YES            |
 | username     | VARCHAR(100)  |  NO         | YES       | NO             |
 | password     | VARCHAR(100)  |  NO         | YES       | NO             |
-| created_at   | DATETIME      |  NO         | YES       | NO             |
 
 **Indexes**
 | Columns    | Type   | Additional |
@@ -25,12 +24,12 @@
 ### Table doctors
 
 #### Basic definition
-- id: Integer, Primary Key (@Id), Auto Increment
-- name: String, Not Null
-- email: String, Unique, Not Null
-- password: String, Not Null
-- specialty: String, Not Null 
-- phone: String, Not Null, Only Digits
+- id: Integer, Primary Key (@Id), Auto Increment.
+- name: String, Not Null.
+- specialty: String, Not Null.
+- email: String, Unique, Not Null.
+- password: String, Not Null.
+- phone: String, Not Null, Only Digits.
 
 
 #### MySQL details
@@ -38,9 +37,9 @@
 |--------------|---------------|-------------|----------|-----------------|
 | id           | INT           |  YES        | YES      | YES             |
 | name         | VARCHAR(100)  |  NO         | YES      | NO              |
+| specialty    | VARCHAR(50)   |  NO         | YES      | NO              |
 | email        | VARCHAR(100)  |  NO         | YES      | NO              |
 | password     | VARCHAR(100)  |  NO         | YES      | NO              |
-| specialty    | VARCHAR(50)   |  NO         | YES      | NO              |
 | phone        | VARCHAR(10)   |  NO         | YES      | NO              |
 
 **Indexes**
@@ -62,8 +61,6 @@
 - email: String, Unique, Not Null
 - password: String, Not Null
 - phone: String, Not Null, Only Digits
-- date_of_birth: LocalDate, Not Null
-- gender: ENUM ('MALE', 'FEMALE', 'OTHER')
 - address: String, Not Null
 
 #### MySQL details
@@ -74,8 +71,6 @@
 | email         | VARCHAR(100)                    |  NO         | YES      | NO             |
 | password      | VARCHAR(100)                    |  NO         | YES      | NO             |
 | phone         | VARCHAR(10)                     |  NO         | YES      | NO             |
-| date_of_birth | DATE                            |  NO         | YES      | NO             |
-| gender        | ENUM('MALE', 'FEMALE', 'OTHER') |  NO         | YES      | NO             |
 | address       | VARCHAR(255)                    |  NO         | YES      | NO             |
 
 **Indexes**
@@ -115,39 +110,19 @@
 ### Collection prescriptions
 ```json
 {
-  "_id": ObjectId("644mkl..."),
-  "appointmentId": 10,
-  "doctorId": 5,
-  "patientId": 8,
+  "_id": ObjectId("6807dd712725f013281e7201"),
   "patientName": "John Smith",
-  "medications": [
-    {
-      "id": "med1",
-      "name": "Amoxicillin",
-      "dosage": "500mg",
-      "frequency": "3 per day during 7 days"
-    },
-    {
-      "id": "med2",
-      "name": "Ibuprofen",
-      "dosage": "200mg",
-      "frequency": "as needed"
-    }
-  ],
-  "doctorNotes": "Some note",
-  "status": "ACTIVE",
-  "issuedAt": "2025-02-03T10:10:00Z",
-  "createdAt": "2025-02-03T10:10:00Z",
-  "updatedAt": "2025-02-03T10:10:00Z"
+  "appointmentId": 51,
+  "medication": "Paracetamol",
+  "dosage": "500mg",
+  "doctorNotes": "Take 1 tablet every 6 hours."
 }
 ```
 
 ### Restrictions:
 - id: MongoDB Id, auto-generated
 - appointmentId: appointment's entity id, valid long
-- doctorId: doctor's entity id, valid long
-- patientId: patient's entity id, valid long
 - patientName: required, 3-100 characters
 - medication: required, 3-100 characters.
 - dosage: required, 3-20 characters.
-- frequency: require, 3-150 characters
+- doctorNotes: not required, max 200 characters.

@@ -24,21 +24,12 @@ public class Admin {
     @Column(nullable = false, length = 100)
     private String password;
 
-    @NotNull
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
     public Admin() {
     }
 
     public Admin(String username, String password) {
         this.username = username;
         this.password = password;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -63,13 +54,5 @@ public class Admin {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }
