@@ -1,3 +1,6 @@
+export function createDoctorCard(doctor) {
+}
+
 /*
 Import the overlay function for booking appointments from loggedPatient.js
 

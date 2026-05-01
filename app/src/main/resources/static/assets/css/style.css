@@ -1,6 +1,3 @@
-/* This is the style sheet for global change across the files. */
-
-/* style.css */
 .header {
     display: flex;
     justify-content: space-between;
@@ -12,42 +9,47 @@
     flex-wrap: wrap;
     min-height: 60px;
   }
-  
+
   /* Logo section with image + title */
-  .logo-link{
+  .logo-link, .logo-section{
     display: flex;
     align-items: center;
     gap: 10px;
-    
+
   }
-  
+
   .logo-img {
     height: 40px;
     width: auto;
     max-width: 100%;
     object-fit: contain;
   }
-  
+
   /* Logo text / slogan */
   .logo-title {
     font-size: 20px;
     font-weight: bold;
     color: #333;
   }
-  
+
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
   /* Nav links styling */
   nav a {
-    margin-left: 20px;
-    margin-right: 20px;
+    margin: 0;
     text-decoration: none;
     color: #333;
     font-weight: bold;
   }
-  
+
   nav a:hover {
     color: #003e3e;
   }
-  
+
 
   /* Responsive behavior */
   @media (max-width: 600px) {
@@ -55,20 +57,20 @@
       flex-direction: column;
       align-items: flex-start;
     }
-  
+
     nav {
       margin-top: 10px;
     }
-  
+
     nav a {
       margin-left: 0;
       margin-right: 10px;
     }
-  
+
     .logo-img {
       height: 30px;
     }
-  
+
     .logo-title {
       font-size: 18px;
     }
@@ -82,13 +84,15 @@
   }
 /* Footer Section */
 .footer {
-    background-color: #f4f4f4;
+
     color: #fff;
     padding: 40px 20px;
     border-top: 2px solid #f4f4f4;
-    
+    background: linear-gradient(#FFF, #AAA);
+
+
   }
-  
+
   .footer-container {
     display: flex;
     flex-wrap: wrap;
@@ -97,7 +101,7 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-  
+
   .footer-logo {
     flex: 1 1 250px;
     display: flex;
@@ -105,17 +109,17 @@
     align-items: flex-start;
     gap: 15px;
   }
-  
+
   .footer-logo img {
     height: 50px;
     width: auto;
   }
-  
+
   .footer-logo p {
     font-size: 14px;
     color: #0a0a23;
   }
-  
+
   .footer-links {
     display: flex;
     flex: 2 1 500px;
@@ -123,44 +127,44 @@
     flex-wrap: wrap;
     gap: 20px;
   }
-  
+
   .footer-column {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .footer-column h4 {
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 8px;
     color: #0a0a23;
   }
-  
+
   .footer-column a {
     text-decoration: none;
     color: #0a0a23;
     font-size: 14px;
   }
-  
+
   .footer-column a:hover {
     color: #003e3e;
     transition: color 0.3s ease;
   }
-  
+
   /* Mobile Responsiveness */
   @media (max-width: 768px) {
     .footer-container {
       flex-direction: column;
       align-items: flex-start;
     }
-  
+
     .footer-links {
       flex-direction: column;
       gap: 20px;
     }
   }
-  
+
 
   .modal {
     display: none;
@@ -173,7 +177,7 @@
     height: 100%;
     background-color: rgba(0,0,0,0.6);
   }
-  
+
   .modal-content {
     background-color: white;
     margin: auto;
@@ -182,7 +186,7 @@
     width: 400px;
     position: relative;
   }
-  
+
   .modal-content h2{
     font-size: 32px;
   }
@@ -196,12 +200,10 @@
     font-weight: bold;
     cursor: pointer;
   }
-  
+
   .close:hover {
     color: black;
   }
-
-
 
   .dashboard-btn{
     width: 100%;
@@ -220,30 +222,30 @@
     cursor: pointer;
     border-radius: 8px;
   }
-  
+
   .input-field:hover {
     border-color: #015c5d;
     background-color: #f0fdfd;
   }
-  
+
   .input-field:focus {
     outline: none;
     border-color: #015c5d;
     box-shadow: 0 0 5px rgba(1, 92, 93, 0.5);
     filter: brightness(1.2);
   }
-  
+
   .select-dropdown option {
     font-size: 16px;
     padding: 10px;
   }
-  
+
 
   #content {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(315px, 1fr));
     gap: 40px;
-    padding: 20px;
+    padding: 20px 0;
   }
 
   .doctor-card {
@@ -258,61 +260,75 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: transform 0.2s ease;
   }
-  
+
   .doctor-card:hover {
     transform: scale(1.02);
   }
-  
+
   .doctor-info {
-    padding: 12px;
+    padding: 12px 0;
     flex-grow: 1;
   }
-  
+
   .doctor-info h3 {
     margin-top: 30px;
     font-size: 24px;
     color: #015c5d;
   }
-  
+
+  .doctor-card ul {
+    list-style-type: none;
+  }
+
+  .doctor-card ul li {
+      border-bottom: 1px solid #CCD;
+      padding: 5px;
+  }
+
   .doctor-info p {
     margin: 20px 0px;
     font-size: 14px;
     color: #555;
   }
-  
+
   .card-actions {
-    background-color: #e28282;
-    padding: 10px;
+    /* background-color: #e28282; */
+    background-color: #003e3e;
+
+    padding: 10px 20px;
     text-align: center;
   }
 
   .card-actions:hover {
-    background-color: #d26969;
+    /* background-color: #d26969; */
+    background-color: #015c5d;
+
   }
-  
+
   .card-actions button {
     background: transparent;
+    margin: 0;
     border: none;
     color: #fff;
     font-weight: bold;
     cursor: pointer;
   }
-  
+
   .card-actions button:hover {
     color: #fff;
     border-color: #015c5d;
   }
-  
+
   #roleSelector {
     width:auto;
     border-radius: 10px;
   }
-  
+
   span {
     color : #A62B1F;
   }
 
-  .searchBar{
+  .searchBar {
     height: 30px;
     padding:20px;
     font-size: 16px;
@@ -320,7 +336,7 @@
     border: 0.2px solid grey;
 }
 
-  .searchBar:focus{
+  .searchBar:focus {
     outline: none;
     border-color: #015c5d;
     box-shadow: 0 0 5px rgba(1, 92, 93, 0.697);
@@ -379,4 +395,3 @@
   margin-right: 0.5rem;
   accent-color: #015c5db8; 
 }
-
