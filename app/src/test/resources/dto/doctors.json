@@ -1,0 +1,20 @@
+{
+  "doctors": [
+    {
+      "id": 1,
+      "name": "Jane Doe",
+      "specialty": "Cardiologist",
+      "email": "jane.doe@email.com",
+      "phone": "555-101-2020",
+      "availableTimes": ["09:00-10:00", "10:00-11:00"]
+    },
+    {
+      "id": 2,
+      "name": "John Doe",
+      "specialty": "Neurologist",
+      "email": "john.doe@email.com",
+      "phone": "444-101-2020",
+      "availableTimes": []
+    }
+  ]
+}

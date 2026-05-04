@@ -5,8 +5,6 @@ import { createDoctorCard } from './components/doctorCard.js';
 import { filterDoctors } from './services/doctorServices.js';//call the same function to avoid duplication coz the functionality was same
 import { patientSignup, patientLogin } from './services/patientServices.js';
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
   loadDoctorCards();
 });

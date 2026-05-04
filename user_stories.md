@@ -107,10 +107,11 @@ Scenario: View monthly appointments from CLI
 ```gherkin
 Scenario: View the list of available doctors
   Given I am not logged in
-  And I am on the home page
-  When I navigate to the doctors page
-  Then I should see a list of doctors
-  And each doctor should display name and specialty
+  And I am on the role selection page
+  When I select the "Patient" role
+  Then I should be redirected to the patient dashboard
+  And I should see a list of available doctors
+  And each doctor should display name, specialty, and available times
 ```
 
 ### Registration and login
