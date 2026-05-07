@@ -11,7 +11,8 @@ so that I can decide how to proceed._
 
 ---
 
-## Feature
+## Feature (Gherkin)
+
 ```gherkin
 Feature: Patient dashboard (guest access)
 

@@ -11,7 +11,8 @@ so that I can find the most suitable doctor_
 
 ---
 
-## Feature
+## Feature (Gherkin)
+
 ```gherkin
 Feature: Search available doctors
 
