@@ -59,11 +59,11 @@ Scenario: Successfully adding a doctor
    15:00-16:00
   ```
 
-## Functional Behavior (optional)
+## Functional Behavior
 - The password input should hide typed characters
 - The submit button should remain disabled until all required fields are valid
 
-## Edge cases (Optional)
+## Edge cases
 ```gherkin
 Scenario: Email duplicated
   When the user enters an already registered email
