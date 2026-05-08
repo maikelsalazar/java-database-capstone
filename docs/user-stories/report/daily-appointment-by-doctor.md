@@ -6,8 +6,8 @@
 ---
 
 ## User Story
-_As a database admin, I want to get the Daily Appointment By Doctor Report, 
-so that I can share it with stakeholders for data analysis._
+_As a database admin, I want to generate the Daily Appointments by Doctor Report, 
+so that it can be used for daily operational reviews at the clinic.._
 
 ---
 
