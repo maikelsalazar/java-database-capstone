@@ -19,20 +19,20 @@ Scenario: Successfully log in as patient
   And I am on the role selection page
   
   When I select the "Patient" role
-  Then I should be redirected to the patient dashboard public page
+  Then I should be redirected to the public patient dashboard page
   
   When I click the "Log In" button
   Then the Log In modal should be displayed
 
   When I enter a valid email and password
   And I submit the Log In form
-  Then I should be redirected to the authenticated patient dashboard
+  Then I should be redirected to the protected patient dashboard
 ```  
 
 ## Acceptance Criteria
 ### 1. Successful Login With Valid Credentials
 - The system must authenticate the patient user
-- The user must be redirected to the patient dashboard page
+- The user must be redirected to the protected patient dashboard
 - The authenticated session must persist until the user logs out or the session expires
 
 ### 2. Unsuccessful Login With Invalid Credentials
