@@ -20,56 +20,58 @@ Scenario: Access patient dashboard as a guest
   Given I am not authenticated
   And I am on the role selection page
   When I select the "Patient" role
-  Then I should be redirected to "/pages/patientDashboard.html"
-  And I should see a list of available doctors
-  And each doctor should display name, specialty, available times, phone, and email
-  And I should see "Login" and "Sign Up" buttons
+  Then I should be redirected to the public patient dashboard page
+  And I should see a list of doctors with available time slots
+  And each doctor card should display:
+    - Name
+    - Specialty
+    - Phone
+    - Email
+    - Available time slots
+  And I also should see "Login" and "Sign Up" buttons
 ```
 
 ## Acceptance Criteria
+
 ### 1. Navigation
-    - Selecting "Patient" redirects to:
-      ```
-      /pages/patientDashboard.html
-      ```
-    - Page must be accessible **without authentication**.
-    - Direct URL access should also work (no redirect loop)
-### 2. Doctor List
-- Displays all doctors marked as **available**
-- Each doctor must include:
+- Selecting "Patient" redirects to the public patient dashboard page
+- The page must be publicly accessible **without authentication**
+- Direct URL access must not redirect to login or create a redirect loop
+
+### 2. Filter Doctors Form
+- The page must display the "Filter Doctors" form
+- It must display the following fields:
+    - Name Filter (input)
+    - Time Filter (select)
+    - Specialty Filter (select)
+
+### 3. List of Doctors With Available Time Slots
+- The system must automatically load the list of doctors with available time slots
+- Each doctor card must include:
   - Name
   - Specialty
-  - Available times
   - Phone number
   - Email
+  - Available time slots
 
 **Constraints**
 - Each doctor must appear only once in the list
-- Available times must be displayed in a readable format (e.g. "10:00-11:00", not raw DB format)
+- Available time slots must be displayed in a readable format (e.g. "10:00-11:00", not raw DB format)
 
-### 3. Login Button
-- Open login modal
-```gherkin
-  Scenario: Open login modal
-    When I click the "Login" button
-    Then I should see the patient login form
-```
-### 4. Sign Up Button
-- Open registration modal
-  ```gherkin
-    Scenario: Open registration modal
-      When I click the "Sign Up" button
-      Then I should see the patient registration form
-  ```
+### 4. Login Button
+- Clicking the "Log In" button must open the "Patient Login Modal" within a modal
+
+### 5. Sign Up Button
+- Clicking the "Sign Up" button must open the "Patient Sign Up Modal" within a modal
 
 ## Functional behavior
 
 ### 1. Loading State
 ```gherkin
 Scenario: Show loading state
-  When the dashboard is loading
+  When the public patient dashboard is loading
   Then I should see a loading indicator
-  And the doctor list should not be visible until loading completes
+  And the list of doctors with available time slots should not be visible until loading completes
 ```
 
 ### 2. Navigation Consistency
@@ -95,10 +97,10 @@ Scenario: API error when loading doctors
   And I should have an option to retry
 ```
 
-## API Contract
+## API Contract (Backend)
 __Request:__
 ```http
-GET /api/doctor/list
+GET /api/doctors/list
 ```
 __Response:__
 ```json
@@ -133,3 +135,10 @@ __Response:__
   ]
 }
 ```
+**Clarification:**
+- This endpoint returns unfiltered available doctors for guest users.
+
+## Additional Notes
+- This user story only includes what the public patient dashboard page must have.
+- Every functionality in the public patient dashboard page is specified in its own user story.
+- The public patient dashboard page is accessible at: `/pages/patientDashboard.html
