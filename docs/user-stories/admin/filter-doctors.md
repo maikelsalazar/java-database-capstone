@@ -78,7 +78,6 @@ Scenario: Filter doctors by name, specialty, and time
 - Only non-"*" values are applied.
 - All applied filters must be combined using AND logic.
 
-
 ## Edge Cases
 ```gherkin
 Scenario: No matching doctors found
