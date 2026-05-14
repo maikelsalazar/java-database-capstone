@@ -58,6 +58,5 @@ GET /endpoint
 }
 ```
 
-
 ## Additional Notes (Optional)
 - [Only if truly necessary]
