@@ -9,6 +9,7 @@
 _As an authenticated admin user, I want to access the admin dashboard where I can view the "Log Out" button,
 the "Add Doctor" button, a "Filter Doctors" form, and the list of doctors with available time slots where each doctor card displays
 the doctor's information and a "Delete Doctor" button, so that I can manage doctors and system operations._
+
 ---
 
 ## Feature (Gherkin)
@@ -107,7 +108,8 @@ Scenario: Access admin dashboard without proper authorization
 - Only authenticated admin users must be able to access the admin dashboard
 - After logging out, the admin dashboard must no longer be accessible
 
-## API Contract
+## API Contract (Backend)
+
 __Request:__
 ```http
 GET /api/doctors/list

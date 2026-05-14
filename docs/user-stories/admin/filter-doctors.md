@@ -95,7 +95,7 @@ Scenario: All filters are wildcard
   Then I should see all available doctors
 ```
 
-## API Contract
+## API Contract (Backend)
 
 __Request:__
 ```http

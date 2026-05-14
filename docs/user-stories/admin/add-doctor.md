@@ -85,10 +85,10 @@ Scenario: Close Add Doctor modal
   Then the modal should be hidden
 ```
 
-## API Contract (Backend) (Optional)
+## API Contract (Backend)
 **Request**
 ```http
-POST /api/doctor
+POST /api/doctors
 
 {
   "name": "John doe",

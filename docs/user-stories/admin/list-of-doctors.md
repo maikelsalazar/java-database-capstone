@@ -34,7 +34,6 @@ Scenario: Successfully view the list of doctors with available time slots
   - Available time slots
   - The "Delete" button
 
-
 **Constraints**
 - Each doctor must appear only once in the list
 - Available times must be displayed in a readable format (e.g. "10:00-11:00", not raw DB format)
@@ -58,7 +57,7 @@ Scenario: No available doctors
   Then I should see a message "No doctors available at the moment"
 ```
 
-## API Contract
+## API Contract (Backend)
 __Request:__
 ```http
 GET /api/doctors/list
