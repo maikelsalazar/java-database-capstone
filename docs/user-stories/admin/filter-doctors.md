@@ -1,4 +1,4 @@
-# Feature: Filter Doctors
+# Filter Doctors As Admin
 
 **Priority:** Low
 **Story Points:** 3
