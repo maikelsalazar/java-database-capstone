@@ -26,6 +26,7 @@ Scenario: Successfully log in as admin
 ```  
 
 ## Acceptance Criteria
+
 ### 1. Successful Login With Valid Credentials
 - The system must authenticate the admin user
 - The user must be redirected to the admin dashboard page
@@ -68,4 +69,37 @@ Scenario: Submit invalid credentials
   And I submit the login form
   Then I should see an "Invalid credentials" message
   And I should remain on the current page
+```
+
+## API Contract (Backend)
+
+**Request**
+```http
+POST /api/admin/login
+
+{
+"username": "admin@example.com",
+"password": "admin@1234"
+}
+```
+
+**Success Response**
+```http
+Status Code: 200
+
+{
+  "success": true,
+  "token": "jwt-token",
+  "message": "Login successful"
+}
+```
+
+**Fail response**
+```
+Status Code: 401
+
+{
+  "success": false,
+  "message": "Invalid credentials"
+}
 ```
