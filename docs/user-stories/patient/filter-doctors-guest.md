@@ -38,15 +38,13 @@ Scenario: Filter doctors by name, specialty, and time
     - Available time slots
     - The "Book" button
 
-### 1. Name filter:
+### 2. Name filter:
 - Partial match (e.g. "le" -> "Sarah Lee", "Lee Martin").
 - Case insensitive.
 - Ignores leading/trailing spaces.
 - Matches against full doctor name.
-- The system should avoid unnecessary filtering requests while the user is typing.
 
-
-### 2. Time filter:
+### 3. Time filter:
 - Options: AM or PM
 - Based on doctor's available time slots:
     - AM: 00:00 ≤ time < 12:00
@@ -54,18 +52,18 @@ Scenario: Filter doctors by name, specialty, and time
 - A doctor is included if _at least one available time slot_ matches the selected time filter
 - Time filtering must be based on the start time of each available slot.
 
-### 3. Specialty Filter:
+### 4. Specialty Filter:
 - Exact match from predefined specialties
 - Case insensitive
 
-### 4. Combination:
+### 5. Combination:
 - All filters must be applied together using AND logic.
 - If a filter is not applied, the frontend must send "*" as the value
     - "*" for name means no name filtering (include all doctors)
     - "*" for time means no time filtering (include all time periods)
     - "*" for specialty means no specialty filtering (include any specialty)
 
-### 5. Book Button
+### 6. Book Button
 - Clicking the "Book" button must display the login form in a modal
 
 **Considerations**
