@@ -13,7 +13,7 @@ so that I can choose an available doctor and book an appointment.._
 
 ## Feature (Gherkin)
 ```gherkin
-Feature: Feature: List of doctors with available time slots for guest patients
+Feature: List of doctors with available time slots for guest patients
 
 Scenario: Successfully view the list of doctors with available time slots
   Given I am a non-authenticated patient user
