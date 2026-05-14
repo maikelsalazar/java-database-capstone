@@ -65,4 +65,3 @@ Scenario: Invalid role route
 ## Additional Notes
 - The index page acts as the public entry point of the system
 - Authentication behavior is handled separately by each role
-
