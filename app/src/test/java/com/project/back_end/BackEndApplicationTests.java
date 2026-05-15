@@ -52,12 +52,12 @@ class BackEndApplicationTests {
 
     @BeforeEach
     void cleanDatabase() {
-        doctorRepository.deleteAll();
+        doctorRepository.deleteAllInBatch();
     }
 
     @Test
     void shouldReturnEmptyDoctorListWhenThereIsNoDoctor() throws Exception{
-        mockMvc.perform(get("/api/doctor/list"))
+        mockMvc.perform(get("/api/doctors/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.doctors").isArray())
                 .andExpect(jsonPath("$.doctors.length()").value(0));
@@ -75,7 +75,7 @@ class BackEndApplicationTests {
 
         Doctor savedDoctor = doctorRepository.save(doctor);
 
-        mockMvc.perform(get("/api/doctor/list"))
+        mockMvc.perform(get("/api/doctors/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.doctors").isArray())
                 .andExpect(jsonPath("$.doctors.length()").value(1))
@@ -85,5 +85,141 @@ class BackEndApplicationTests {
                 .andExpect(jsonPath("$.doctors[0].phone").value("5551012020"))
                 .andExpect(jsonPath("$.doctors[0].password").doesNotExist())
                 .andExpect(jsonPath("$.doctors[0].availableTimes.length()").value(2));
+    }
+
+    @Test
+    void shouldReturnFilteredDoctorsByNameOnly() throws Exception {
+        Doctor doctorAM = new Doctor();
+        doctorAM.setName("Jane Doe");
+        doctorAM.setSpecialty("Cardiologist");
+        doctorAM.setEmail("jane.doe@email.com");
+        doctorAM.setPhone("5551012020");
+        doctorAM.setPassword("hashed-password");
+        doctorAM.setAvailableTimes(List.of("09:00-10:00", "10:00-11:00"));
+
+        Doctor doctorPM = new Doctor();
+        doctorPM.setName("John Doe");
+        doctorPM.setSpecialty("Cardiologist");
+        doctorPM.setEmail("john.doe@email.com");
+        doctorPM.setPhone("5551012020");
+        doctorPM.setPassword("hashed-password");
+        doctorPM.setAvailableTimes(List.of("13:00-14:00", "14:00-15:00"));
+
+        Doctor savedDoctorNamed = doctorRepository.save(doctorAM);
+        doctorRepository.save(doctorPM);
+
+        mockMvc.perform(get("/api/doctors/filter/jane/*/*"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.doctors").isArray())
+                .andExpect(jsonPath("$.doctors.length()").value(1))
+                .andExpect(jsonPath("$.doctors[0].id").value(savedDoctorNamed.getId()))
+                .andExpect(jsonPath("$.doctors[0].name").value("Jane Doe"))
+                .andExpect(jsonPath("$.doctors[0].email").value("jane.doe@email.com"))
+                .andExpect(jsonPath("$.doctors[0].phone").value("5551012020"))
+                .andExpect(jsonPath("$.doctors[0].password").doesNotExist())
+                .andExpect(jsonPath("$.doctors[0].availableTimes.length()").value(2))
+                .andExpect(jsonPath("$.doctors[0].availableTimes[0]").value("09:00-10:00"));
+    }
+
+    @Test
+    void shouldReturnFilteredDoctorsByMorningSlotsOnly() throws Exception {
+        Doctor doctorAM = new Doctor();
+        doctorAM.setName("Jane Doe");
+        doctorAM.setSpecialty("Cardiologist");
+        doctorAM.setEmail("jane.doe@email.com");
+        doctorAM.setPhone("5551012020");
+        doctorAM.setPassword("hashed-password");
+        doctorAM.setAvailableTimes(List.of("09:00-10:00", "10:00-11:00"));
+
+        Doctor doctorPM = new Doctor();
+        doctorPM.setName("John Doe");
+        doctorPM.setSpecialty("Cardiologist");
+        doctorPM.setEmail("john.doe@email.com");
+        doctorPM.setPhone("5551012020");
+        doctorPM.setPassword("hashed-password");
+        doctorPM.setAvailableTimes(List.of("13:00-14:00", "14:00-15:00"));
+
+        Doctor savedDoctorAM = doctorRepository.save(doctorAM);
+        doctorRepository.save(doctorPM);
+
+        mockMvc.perform(get("/api/doctors/filter/*/am/*"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.doctors").isArray())
+                .andExpect(jsonPath("$.doctors.length()").value(1))
+                .andExpect(jsonPath("$.doctors[0].id").value(savedDoctorAM.getId()))
+                .andExpect(jsonPath("$.doctors[0].name").value("Jane Doe"))
+                .andExpect(jsonPath("$.doctors[0].email").value("jane.doe@email.com"))
+                .andExpect(jsonPath("$.doctors[0].phone").value("5551012020"))
+                .andExpect(jsonPath("$.doctors[0].password").doesNotExist())
+                .andExpect(jsonPath("$.doctors[0].availableTimes.length()").value(2))
+                .andExpect(jsonPath("$.doctors[0].availableTimes[0]").value("09:00-10:00"));
+    }
+
+    @Test
+    void shouldReturnFilteredDoctorsByAfternoonSlotsOnly() throws Exception {
+        Doctor doctorAM = new Doctor();
+        doctorAM.setName("Jane Doe");
+        doctorAM.setSpecialty("Cardiologist");
+        doctorAM.setEmail("jane.doe@email.com");
+        doctorAM.setPhone("5551012020");
+        doctorAM.setPassword("hashed-password");
+        doctorAM.setAvailableTimes(List.of("09:00-10:00", "10:00-11:00"));
+
+        Doctor doctorPM = new Doctor();
+        doctorPM.setName("John Doe");
+        doctorPM.setSpecialty("Cardiologist");
+        doctorPM.setEmail("john.doe@email.com");
+        doctorPM.setPhone("5551012020");
+        doctorPM.setPassword("hashed-password");
+        doctorPM.setAvailableTimes(List.of("13:00-14:00", "14:00-15:00"));
+
+        doctorRepository.save(doctorAM);
+        Doctor savedDoctorPM = doctorRepository.save(doctorPM);
+
+        mockMvc.perform(get("/api/doctors/filter/*/pm/*"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.doctors").isArray())
+                .andExpect(jsonPath("$.doctors.length()").value(1))
+                .andExpect(jsonPath("$.doctors[0].id").value(savedDoctorPM.getId()))
+                .andExpect(jsonPath("$.doctors[0].name").value("John Doe"))
+                .andExpect(jsonPath("$.doctors[0].email").value("john.doe@email.com"))
+                .andExpect(jsonPath("$.doctors[0].phone").value("5551012020"))
+                .andExpect(jsonPath("$.doctors[0].password").doesNotExist())
+                .andExpect(jsonPath("$.doctors[0].availableTimes.length()").value(2))
+                .andExpect(jsonPath("$.doctors[0].availableTimes[0]").value("13:00-14:00"));
+    }
+
+    @Test
+    void shouldReturnFilteredDoctorsBySpecialtyOnly() throws Exception {
+        Doctor doctorAM = new Doctor();
+        doctorAM.setName("Jane Doe");
+        doctorAM.setSpecialty("Neurologist");
+        doctorAM.setEmail("jane.doe@email.com");
+        doctorAM.setPhone("5551012020");
+        doctorAM.setPassword("hashed-password");
+        doctorAM.setAvailableTimes(List.of("09:00-10:00", "10:00-11:00"));
+
+        Doctor doctorSpecialty = new Doctor();
+        doctorSpecialty.setName("John Doe");
+        doctorSpecialty.setSpecialty("Cardiologist");
+        doctorSpecialty.setEmail("john.doe@email.com");
+        doctorSpecialty.setPhone("5551012020");
+        doctorSpecialty.setPassword("hashed-password");
+        doctorSpecialty.setAvailableTimes(List.of("13:00-14:00", "14:00-15:00"));
+
+        doctorRepository.save(doctorAM);
+        Doctor savedDoctorSpecialty = doctorRepository.save(doctorSpecialty);
+
+        mockMvc.perform(get("/api/doctors/filter/*/*/cardiologist"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.doctors").isArray())
+                .andExpect(jsonPath("$.doctors.length()").value(1))
+                .andExpect(jsonPath("$.doctors[0].id").value(savedDoctorSpecialty.getId()))
+                .andExpect(jsonPath("$.doctors[0].name").value("John Doe"))
+                .andExpect(jsonPath("$.doctors[0].email").value("john.doe@email.com"))
+                .andExpect(jsonPath("$.doctors[0].phone").value("5551012020"))
+                .andExpect(jsonPath("$.doctors[0].password").doesNotExist())
+                .andExpect(jsonPath("$.doctors[0].availableTimes.length()").value(2))
+                .andExpect(jsonPath("$.doctors[0].availableTimes[0]").value("13:00-14:00"));
     }
 }

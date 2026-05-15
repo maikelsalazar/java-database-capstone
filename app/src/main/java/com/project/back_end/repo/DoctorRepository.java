@@ -2,42 +2,78 @@ package com.project.back_end.repo;
 
 import com.project.back_end.models.Doctor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
-    // 1. Extend JpaRepository:
-//    - The repository extends JpaRepository<Doctor, Long>, which gives it basic CRUD functionality.
-//    - This allows the repository to perform operations like save, delete, update, and find without needing to implement these methods manually.
-//    - JpaRepository also includes features like pagination and sorting.
+    @Query("""
+        SELECT DISTINCT d FROM Doctor d
+        JOIN d.availableTimes t
+        WHERE (
+            :time = 'AM' AND CAST(SUBSTRING(t, 1, 2) AS int) < 12
+        )
+        OR (
+            :time = 'PM' AND CAST(SUBSTRING(t, 1, 2) AS int) >= 12
+        )
+    """)
+    List<Doctor> findByTime(@Param("time") String time);
 
-// Example: public interface DoctorRepository extends JpaRepository<Doctor, Long> {}
+    @Query("""
+            SELECT DISTINCT d FROM Doctor d
+            WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%'))
+            """)
+    List<Doctor> findByName(@Param("name") String name);
 
-// 2. Custom Query Methods:
+    @Query("""
+            SELECT DISTINCT d FROM Doctor d
+            WHERE LOWER(d.specialty) LIKE LOWER(CONCAT('%', :specialty, '%'))
+            """)
+    List<Doctor> findBySpecialty(@Param("specialty") String specialty);
 
-//    - **findByEmail**:
-//      - This method retrieves a Doctor by their email.
-//      - Return type: Doctor
-//      - Parameters: String email
+    @Query("""
+            SELECT DISTINCT d FROM Doctor d
+            WHERE LOWER(d.specialty) LIKE LOWER(CONCAT('%', :specialty, '%'))
+            AND LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%'))
+            """)
+    List<Doctor> findByNameAndSpecialty(@Param("name") String name, @Param("specialty") String specialty);
 
-//    - **findByNameLike**:
-//      - This method retrieves a list of Doctors whose name contains the provided search string (case-sensitive).
-//      - The `CONCAT('%', :name, '%')` is used to create a pattern for partial matching.
-//      - Return type: List<Doctor>
-//      - Parameters: String name
+    @Query("""
+            SELECT DISTINCT d FROM Doctor d
+            JOIN d.availableTimes t
+            WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%'))
+            AND (
+                    (:time = 'AM' AND CAST(SUBSTRING(t, 1, 2) AS int) < 12)
+                    OR
+                    (:time = 'PM' AND CAST(SUBSTRING(t, 1, 2) AS int) >= 12)
+                )
+            """)
+    List<Doctor> findByNameAndTime(String name, String time);
 
-//    - **findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase**:
-//      - This method retrieves a list of Doctors where the name contains the search string (case-insensitive) and the specialty matches exactly (case-insensitive).
-//      - It combines both fields for a more specific search.
-//      - Return type: List<Doctor>
-//      - Parameters: String name, String specialty
+    @Query("""
+            SELECT DISTINCT d FROM Doctor d
+            JOIN d.availableTimes t
+            WHERE LOWER(d.specialty) LIKE LOWER(CONCAT('%', :specialty, '%'))
+            AND (
+                    (:time = 'AM' AND CAST(SUBSTRING(t, 1, 2) AS int) < 12)
+                    OR
+                    (:time = 'PM' AND CAST(SUBSTRING(t, 1, 2) AS int) >= 12)
+                )
+            """)
+    List<Doctor> findByTimeAndSpecialty(@Param("time") String time, @Param("specialty") String specialty);
 
-//    - **findBySpecialtyIgnoreCase**:
-//      - This method retrieves a list of Doctors with the specified specialty, ignoring case sensitivity.
-//      - Return type: List<Doctor>
-//      - Parameters: String specialty
-
-// 3. @Repository annotation:
-//    - The @Repository annotation marks this interface as a Spring Data JPA repository.
-//    - Spring Data JPA automatically implements this repository, providing the necessary CRUD functionality and custom queries defined in the interface.
-
+    @Query("""
+            SELECT DISTINCT d FROM Doctor d
+            JOIN d.availableTimes t
+            WHERE LOWER(d.specialty) LIKE LOWER(CONCAT('%', :specialty, '%'))
+            AND LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%'))
+            AND (
+                    (:time = 'AM' AND CAST(SUBSTRING(t, 1, 2) AS int) < 12)
+                    OR
+                    (:time = 'PM' AND CAST(SUBSTRING(t, 1, 2) AS int) >= 12)
+                )
+            """)
+    List<Doctor> findByNameAndTimeAndSpecialty(@Param("name") String name, @Param("time") String time, @Param("specialty") String specialty);
 }

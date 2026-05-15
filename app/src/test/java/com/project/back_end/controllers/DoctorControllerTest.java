@@ -3,6 +3,7 @@ package com.project.back_end.controllers;
 import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.DTO.DoctorsDTO;
 import com.project.back_end.services.DoctorService;
+import com.project.back_end.services.Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,7 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(DoctorController.class)
+@WebMvcTest(controllers = DoctorController.class)
 @TestPropertySource(properties = "api.path=/api/")
 public class DoctorControllerTest {
 
@@ -27,6 +28,9 @@ public class DoctorControllerTest {
     @MockBean
     private DoctorService doctorService;
 
+    @MockBean
+    private Service service;
+
     @Test
     void shouldReturnListOfDoctors() throws Exception {
 
@@ -34,9 +38,9 @@ public class DoctorControllerTest {
 
         DoctorsDTO mockResponse = new DoctorsDTO(doctorList);
 
-        when(doctorService.findAllDoctor()).thenReturn(mockResponse);
+        when(doctorService.getDoctors()).thenReturn(mockResponse);
 
-        mockMvc.perform(get("/api/doctor/list"))
+        mockMvc.perform(get("/api/doctors/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.doctors").isArray())
                 .andExpect(jsonPath("$.doctors[0].id").value(1))
@@ -54,20 +58,20 @@ public class DoctorControllerTest {
                 .andExpect(jsonPath("$.doctors[1].availableTimes").isArray())
                 .andExpect(jsonPath("$.doctors[1].availableTimes.length()").value(0));
 
-        verify(doctorService).findAllDoctor();
+        verify(doctorService).getDoctors();
         verifyNoMoreInteractions(doctorService);
     }
 
     @Test
     void shouldReturnEmptyList() throws Exception{
-        when(doctorService.findAllDoctor()).thenReturn(new DoctorsDTO(List.of()));
+        when(doctorService.getDoctors()).thenReturn(new DoctorsDTO(List.of()));
 
-        mockMvc.perform(get("/api/doctor/list"))
+        mockMvc.perform(get("/api/doctors/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.doctors").isArray())
                 .andExpect(jsonPath("$.doctors.length()").value(0));
 
-        verify(doctorService).findAllDoctor();
+        verify(doctorService).getDoctors();
         verifyNoMoreInteractions(doctorService);
     }
 
