@@ -1,8 +1,9 @@
+import { setRole, getToken } from "./util.js";
 // render.js
 
 function selectRole(role) {
   setRole(role);
-  const token = localStorage.getItem('token');
+  const token = getToken('token');
   if (role === "admin") {
     if (token) {
       window.location.href = `/adminDashboard/${token}`;
@@ -26,3 +27,6 @@ function renderContent() {
     return;
   }
 }
+
+window.selectRole = selectRole;
+window.renderContent = renderContent;

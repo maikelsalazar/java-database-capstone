@@ -6,9 +6,9 @@ import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = DoctorController.class)
-@TestPropertySource(properties = "api.path=/api/")
+@AutoConfigureMockMvc(addFilters = false)
 public class DoctorControllerTest {
 
     @Autowired
@@ -63,7 +63,7 @@ public class DoctorControllerTest {
     }
 
     @Test
-    void shouldReturnEmptyList() throws Exception{
+    void shouldReturnEmptyList() throws Exception {
         when(doctorService.getDoctors()).thenReturn(new DoctorsDTO(List.of()));
 
         mockMvc.perform(get("/api/doctors/list"))

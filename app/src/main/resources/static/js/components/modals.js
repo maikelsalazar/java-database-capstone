@@ -1,3 +1,5 @@
+import { adminLoginHandler } from "../services/index.js";
+
 // modals.js
 export function openModal(type) {
   let modalContent = '';
@@ -59,9 +61,10 @@ export function openModal(type) {
   } else if (type === 'adminLogin') {
     modalContent = `
         <h2>Admin Login</h2>
-        <input type="text" id="username" name="username" placeholder="Username" class="input-field">
+        <span id="loginMessage"></span>
+        <input type="text" id="username" name="username" autocomplete="off" placeholder="Username" class="input-field">
         <input type="password" id="password" name="password" placeholder="Password" class="input-field">
-        <button class="dashboard-btn" id="adminLoginBtn" >Login</button>
+        <button class="dashboard-btn" id="adminLoginSubmitBtn" >Login</button>
       `;
   } else if (type === 'doctorLogin') {
     modalContent = `
@@ -92,7 +95,7 @@ export function openModal(type) {
   }
 
   if (type === 'adminLogin') {
-    document.getElementById('adminLoginBtn').addEventListener('click', adminLoginHandler);
+    document.getElementById('adminLoginSubmitBtn').addEventListener('click', adminLoginHandler);
   }
 
   if (type === 'doctorLogin') {

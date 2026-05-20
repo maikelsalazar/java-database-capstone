@@ -17,7 +17,7 @@ function renderHeader() {
     return;
   }
 
-  const role = getRole();
+  const role = localStorage.getItem("userRole");
 
   let headerContent = `<header class="header">
        <div class="logo-section">
@@ -27,6 +27,11 @@ function renderHeader() {
        <nav>`;
 
   switch(role) {
+    case "admin":
+        headerContent += `
+              <button id="addDocBtn" class="adminBtn" onclick="openModal('addDoctor')">Add Doctor</button>
+              <a href="#" onclick="logout()">Logout</a>`;
+      break;
     case 'patient':
         headerContent += `
             <button id="patientLogin" class="adminBtn">Login</button>
@@ -41,6 +46,13 @@ function renderHeader() {
         `;
 
   headerDiv.innerHTML = headerContent;
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userRole");
+
+    window.location.href = "/";
 }
 
 renderHeader();

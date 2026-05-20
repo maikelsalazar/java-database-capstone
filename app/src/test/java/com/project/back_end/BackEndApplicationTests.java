@@ -1,12 +1,15 @@
 package com.project.back_end;
 
+import com.project.back_end.models.Admin;
 import com.project.back_end.models.Doctor;
+import com.project.back_end.repo.AdminRepository;
 import com.project.back_end.repo.DoctorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +35,12 @@ class BackEndApplicationTests {
     @Autowired
     private DoctorRepository doctorRepository;
 
+    @Autowired
+    private AdminRepository adminRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Container
     static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("cms")
@@ -52,18 +61,19 @@ class BackEndApplicationTests {
 
     @BeforeEach
     void cleanDatabase() {
+        adminRepository.deleteAllInBatch();
         doctorRepository.deleteAllInBatch();
     }
 
     @Test
-    void shouldReturnEmptyDoctorListWhenThereIsNoDoctor() throws Exception{
+    void shouldReturnEmptyDoctorListWhenThereIsNoDoctor() throws Exception {
         mockMvc.perform(get("/api/doctors/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.doctors").isArray())
                 .andExpect(jsonPath("$.doctors.length()").value(0));
     }
 
-	@Test
+    @Test
     void shouldReturnAllDoctorsWhenDataIsSaved() throws Exception {
         Doctor doctor = new Doctor();
         doctor.setName("Jane Doe");
