@@ -1,9 +1,12 @@
 package com.project.back_end.services;
 
 import com.project.back_end.DTO.AdminLoginDTO;
+import com.project.back_end.DTO.DoctorLoginDTO;
 import com.project.back_end.DTO.DoctorsDTO;
 import com.project.back_end.models.Admin;
+import com.project.back_end.models.Doctor;
 import com.project.back_end.repo.AdminRepository;
+import com.project.back_end.repo.DoctorRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -14,6 +17,8 @@ public class Service {
 
     private AdminRepository adminRepository;
 
+    private DoctorRepository doctorRepository;
+
     private PasswordEncoder passwordEncoder;
 
     private CustomUserDetailsService userDetailsService;
@@ -22,11 +27,13 @@ public class Service {
 
     public Service(DoctorService doctorService,
                    AdminRepository adminRepository,
+                   DoctorRepository doctorRepository,
                    PasswordEncoder passwordEncoder,
                    CustomUserDetailsService userDetailsService,
                    TokenService tokenService) {
         this.doctorService = doctorService;
         this.adminRepository = adminRepository;
+        this.doctorRepository = doctorRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
         this.tokenService = tokenService;
@@ -81,6 +88,23 @@ public class Service {
         if (!valid) return null;
 
         UserDetails user = userDetailsService.buildUser(admin);
+
+        return tokenService.generateToken(user);
+    }
+
+    public String validateDoctor(DoctorLoginDTO doctorLogin) {
+        Doctor doctor = doctorRepository.findByEmail(doctorLogin.getEmail());
+
+        if (doctor == null) return null;
+
+        boolean valid = passwordEncoder.matches(
+                doctorLogin.getPassword(),
+                doctor.getPassword()
+        );
+
+        if (!valid) return null;
+
+        UserDetails user = userDetailsService.buildUser(doctor);
 
         return tokenService.generateToken(user);
     }

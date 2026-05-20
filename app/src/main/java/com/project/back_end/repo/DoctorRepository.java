@@ -9,6 +9,10 @@ import java.util.List;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
+    Doctor findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
     @Query("""
         SELECT DISTINCT d FROM Doctor d
         JOIN d.availableTimes t

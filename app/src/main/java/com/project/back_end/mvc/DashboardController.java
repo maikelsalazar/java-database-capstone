@@ -21,4 +21,13 @@ public class DashboardController {
 
         return "redirect:/index.html";
     }
+
+    @GetMapping("/doctorDashboard/{token}")
+    public String doctorDashboard(@PathVariable String token) {
+        if (service.validateToken(token, Role.DOCTOR)) {
+            return "doctor/doctorDashboard";
+        }
+
+        return "redirect:/index.html";
+    }
 }

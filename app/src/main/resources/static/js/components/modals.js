@@ -1,4 +1,4 @@
-import { adminLoginHandler } from "../services/index.js";
+import { adminLoginHandler, doctorLoginHandler } from "../services/index.js";
 
 // modals.js
 export function openModal(type) {
@@ -71,7 +71,7 @@ export function openModal(type) {
         <h2>Doctor Login</h2>
         <input type="text" id="email" placeholder="Email" class="input-field">
         <input type="password" id="password" placeholder="Password" class="input-field">
-        <button class="dashboard-btn" id="doctorLoginBtn" >Login</button>
+        <button class="dashboard-btn" id="doctorLoginSubmitBtn" >Login</button>
       `;
   }
 
@@ -99,6 +99,6 @@ export function openModal(type) {
   }
 
   if (type === 'doctorLogin') {
-    document.getElementById('doctorLoginBtn').addEventListener('click', doctorLoginHandler);
+    document.getElementById('doctorLoginSubmitBtn').addEventListener('click', doctorLoginHandler);
   }
 }

@@ -1,5 +1,5 @@
 // util.js
-export function setRole(role) {
+function setRole(role) {
     localStorage.setItem("userRole", role);
 }
 
@@ -15,11 +15,6 @@ function setToken(token) {
     return localStorage.setItem("token", token);
 }
 
-export function getToken(token) {
+function getToken(token) {
     return localStorage.getItem("token");
-}
-
-export function setTokenAndRole(token, role) {
-    setToken(token);
-    setRole(role);
 }

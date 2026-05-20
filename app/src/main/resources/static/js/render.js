@@ -1,9 +1,8 @@
-import { setRole, getToken } from "./util.js";
 // render.js
 
 function selectRole(role) {
-  setRole(role);
-  const token = getToken('token');
+  localStorage.setItem("userRole", role);
+  const token = localStorage.getItem("token");
   if (role === "admin") {
     if (token) {
       window.location.href = `/adminDashboard/${token}`;
@@ -21,7 +20,7 @@ function selectRole(role) {
 
 
 function renderContent() {
-  const role = getRole();
+  const role = localStorage.getItem("userRole");
   if (!role) {
     window.location.href = "/"; // if no role, send to role selection page
     return;

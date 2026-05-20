@@ -18,6 +18,7 @@ function renderHeader() {
   }
 
   const role = localStorage.getItem("userRole");
+  const token = localStorage.getItem("token");
 
   let headerContent = `<header class="header">
        <div class="logo-section">
@@ -26,18 +27,31 @@ function renderHeader() {
        </div>
        <nav>`;
 
+  if ((role === "loggedPatient" || role === "admin" || role === "doctor") && !token) {
+      localStorage.removeItem("userRole");
+      alert("Session expired or invalid login. Please log in again.");
+      window.location.href = "/";
+      return;
+  }
+
   switch(role) {
     case "admin":
         headerContent += `
               <button id="addDocBtn" class="adminBtn" onclick="openModal('addDoctor')">Add Doctor</button>
               <a href="#" onclick="logout()">Logout</a>`;
-      break;
+    break;
+    case 'doctor':
+        headerContent += `
+            <button class="adminBtn"  onclick="selectRole('doctor')">Home</button>
+            <a href="#" onclick="logout()">Logout</a>
+        `;
+    break;
     case 'patient':
         headerContent += `
             <button id="patientLogin" class="adminBtn">Login</button>
             <button id="patientSignup" class="adminBtn">Sign Up</button>
         `;
-    break
+    break;
   }
 
   headerContent += `

@@ -24,7 +24,7 @@ public class DashboardControllerTest {
     private Service service;
 
     @Test
-    void shouldRenderAdminDashboardWhenTokenIsValid() throws Exception {
+    void shouldRenderAdminDashboardWhenTokenIsValidForAdminRole() throws Exception {
 
         when(service.validateToken("valid-token", Role.ADMIN))
                 .thenReturn(true);
@@ -35,12 +35,34 @@ public class DashboardControllerTest {
     }
 
     @Test
-    void shouldRedirectWhenTokenIsInvalid() throws Exception {
+    void shouldRedirectWhenTokenIsInvalidForAdminRole() throws Exception {
 
         when(service.validateToken("invalid-token", Role.ADMIN))
                 .thenReturn(false);
 
         mockMvc.perform(get("/adminDashboard/invalid-token"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/index.html"));
+    }
+
+    @Test
+    void shouldRenderDoctorDashboardWhenTokenIsValidForAdminRole() throws Exception {
+
+        when(service.validateToken("valid-token", Role.DOCTOR))
+                .thenReturn(true);
+
+        mockMvc.perform(get("/doctorDashboard/valid-token"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("doctor/doctorDashboard"));
+    }
+
+    @Test
+    void shouldRedirectWhenTokenIsInvalidForDoctorRole() throws Exception {
+
+        when(service.validateToken("invalid-token", Role.DOCTOR))
+                .thenReturn(false);
+
+        mockMvc.perform(get("/doctorDashboard/invalid-token"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index.html"));
     }
