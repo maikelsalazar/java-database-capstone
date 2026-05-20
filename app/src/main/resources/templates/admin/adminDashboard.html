@@ -15,38 +15,34 @@
 </head>
 <body>
 <div class="container">
-    <div id="header"></div>
-    <main class="main-content">
-        <div class="wrapper">
-
-            <input type="text" id="searchBar" placeholder="search doctor by name" class="searchBar"/>
-            <div id="filters" class="filter-wrapper">
-                <select id="sortByTime" class="filter-select">
-                    <option>AM</option>
-                    <option>PM</option>
-                </select>
-                <select id="filterBySpecialty" class="filter-select">
-                    <option>Filter by specialty</option>
-                    <option>Cardiologist</option>
-                    <option>Neurologist</option>
-                    <option>Orthopedist</option>
-                    <option>Pediatrician</option>
-                    <option>Dermatologist</option>
-                </select>
-            </div>
-            <div id="content">
-                <p>Admin dashboard content</p>
-            </div>
-        </div>
-    </main>
-    <div id="footer"></div>
+    <div class="wrapper">
+        <div id="header"></div>
+        <main class="main-content">
+                <input type="text" id="searchBar" placeholder="search doctor by name" class="searchBar"/>
+                <div id="filters" class="filter-wrapper">
+                    <select id="sortByTime" class="filter-select">
+                        <option>AM</option>
+                        <option>PM</option>
+                    </select>
+                    <select id="filterBySpecialty" class="filter-select">
+                        <option>Filter by specialty</option>
+                        <option>Cardiologist</option>
+                        <option>Neurologist</option>
+                        <option>Orthopedist</option>
+                        <option>Pediatrician</option>
+                        <option>Dermatologist</option>
+                    </select>
+                </div>
+            <div id="content"></div>
+        </main>
+        <div id="footer"></div>
+    </div>
 </div>
 <div id="modal" class="modal">
     <span id="closeModal" class="close">&times;</span>
     <div id="modal-body"></div>
 </div>
 <script type="module" th:src="@{/js/adminDashboard.js}" defer></script>
-<script type="module" th:src="@{/js/components/doctorCard.js}" defer></script>
 
 </body>
 </html>
