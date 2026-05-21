@@ -20,17 +20,27 @@
         <main class="main-content">
                 <input type="text" id="searchBar" placeholder="search doctor by name" class="searchBar"/>
                 <div id="filters" class="filter-wrapper">
-                    <select id="sortByTime" class="filter-select">
+                    <select id="filterTime" class="filter-select">
+                        <option value="*">Filter by Time</option>
                         <option>AM</option>
                         <option>PM</option>
                     </select>
-                    <select id="filterBySpecialty" class="filter-select">
-                        <option>Filter by specialty</option>
-                        <option>Cardiologist</option>
-                        <option>Neurologist</option>
-                        <option>Orthopedist</option>
-                        <option>Pediatrician</option>
-                        <option>Dermatologist</option>
+                    <select id="filterSpecialty" class="filter-select">
+                        <option value="*">Filter by Specialty</option>
+                        <option value="Cardiologist">Cardiologist</option>
+                        <option value="Dermatologist">Dermatologist</option>
+                        <option value="Neurologist">Neurologist</option>
+                        <option value="Pediatrician">Pediatrician</option>
+                        <option value="Orthopedic">Orthopedic</option>
+                        <option value="Gynecologist">Gynecologist</option>
+                        <option value="Psychiatrist">Psychiatrist</option>
+                        <option value="Dentist">Dentist</option>
+                        <option value="Ophthalmologist">Ophthalmologist</option>
+                        <option value="Ent">ENT Specialist</option>
+                        <option value="Urologist">Urologist</option>
+                        <option value="Oncologist">Oncologist</option>
+                        <option value="Gastroenterologist">Gastroenterologist</option>
+                        <option value="General">General Physician</option>
                     </select>
                 </div>
             <div id="content"></div>
