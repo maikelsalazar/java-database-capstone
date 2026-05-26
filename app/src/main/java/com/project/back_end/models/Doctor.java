@@ -1,8 +1,8 @@
 package com.project.back_end.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.project.back_end.enums.AvailableTime;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 
 import java.util.List;
 
@@ -14,32 +14,24 @@ public class Doctor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Doctor's name cannot be null or blank")
-    @Size(min = 3, max = 100)
     @Column(nullable = false, length = 100)
     private String name; // Doctor's full name
 
-    @NotBlank
-    @Size(min = 3, max = 50)
+    @Column(nullable = false, length = 50)
     private String specialty;
 
-    @NotNull
-    @Email
     @Column(nullable = false, length = 100, unique = true)
     private String email;
 
-    @NotNull
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, length = 100)
     private String password;
 
-    @NotBlank
-    @Size(max = 15)
-    @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
+    @Column(nullable = false, length = 15)
     private String phone;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> availableTimes;
+    private List<AvailableTime> availableTimes;
 
     public Doctor() {
     }
@@ -92,11 +84,11 @@ public class Doctor {
         this.phone = phone;
     }
 
-    public List<String> getAvailableTimes() {
+    public List<AvailableTime> getAvailableTimes() {
         return availableTimes;
     }
 
-    public void setAvailableTimes(List<String> availableTimes) {
+    public void setAvailableTimes(List<AvailableTime> availableTimes) {
         this.availableTimes = availableTimes;
     }
 }

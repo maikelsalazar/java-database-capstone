@@ -2,6 +2,7 @@ package com.project.back_end.controllers;
 
 import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
 import org.junit.jupiter.api.Test;
@@ -48,8 +49,8 @@ public class DoctorControllerTest {
                 .andExpect(jsonPath("$.doctors[0].specialty").value("Cardiologist"))
                 .andExpect(jsonPath("$.doctors[0].email").value("jane.doe@email.com"))
                 .andExpect(jsonPath("$.doctors[0].phone").value("555-101-2020"))
-                .andExpect(jsonPath("$.doctors[0].availableTimes[0]").value("09:00-10:00"))
-                .andExpect(jsonPath("$.doctors[0].availableTimes[1]").value("10:00-11:00"))
+                .andExpect(jsonPath("$.doctors[0].availableTimes[0]").value(AvailableTime.SLOT_09_10.getValue()))
+                .andExpect(jsonPath("$.doctors[0].availableTimes[1]").value(AvailableTime.SLOT_10_11.getValue()))
                 .andExpect(jsonPath("$.doctors[1].id").value(2))
                 .andExpect(jsonPath("$.doctors[1].name").value("John Doe"))
                 .andExpect(jsonPath("$.doctors[1].specialty").value("Neurologist"))
@@ -77,7 +78,7 @@ public class DoctorControllerTest {
 
     private List<DoctorDTO> buildDoctors() {
         return List.of(
-                new DoctorDTO(1L, "Jane Doe", "Cardiologist", "jane.doe@email.com", "555-101-2020", List.of("09:00-10:00", "10:00-11:00")),
+                new DoctorDTO(1L, "Jane Doe", "Cardiologist", "jane.doe@email.com", "555-101-2020", List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11)),
                 new DoctorDTO(2L, "John Doe", "Neurologist", "john.doe@email.com", "444-101-2020", List.of())
         );
     }

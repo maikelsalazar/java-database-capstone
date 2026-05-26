@@ -2,6 +2,7 @@ package com.project.back_end.dto;
 
 import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.enums.AvailableTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -22,7 +23,7 @@ class DoctorsDTOJsonTest {
     void doctorsDTOSerializationTest() throws IOException {
         DoctorsDTO doctorsDTO = new DoctorsDTO(
                 List.of(
-                        new DoctorDTO(1L, "Jane Doe", "Cardiologist", "jane.doe@email.com", "555-101-2020", List.of("09:00-10:00", "10:00-11:00")),
+                        new DoctorDTO(1L, "Jane Doe", "Cardiologist", "jane.doe@email.com", "555-101-2020", List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11)),
                         new DoctorDTO(2L, "John Doe", "Neurologist", "john.doe@email.com", "444-101-2020", List.of())
                 )
         );
@@ -55,6 +56,6 @@ class DoctorsDTOJsonTest {
         assertThat(result.getDoctors().get(0).getSpecialty()).isEqualTo("Cardiologist");
         assertThat(result.getDoctors().get(0).getEmail()).isEqualTo("jane.doe@email.com");
         assertThat(result.getDoctors().get(0).getPhone()).isEqualTo("555-101-2020");
-        assertThat(result.getDoctors().get(0).getAvailableTimes().get(0)).isEqualTo("09:00-10:00");
+        assertThat(result.getDoctors().get(0).getAvailableTimes().get(0).getValue()).isEqualTo(AvailableTime.SLOT_09_10.getValue());
     }
 }

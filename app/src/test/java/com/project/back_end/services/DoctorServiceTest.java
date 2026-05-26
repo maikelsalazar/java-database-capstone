@@ -1,6 +1,7 @@
 package com.project.back_end.services;
 
 import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.repo.AppointmentRepository;
 import com.project.back_end.repo.DoctorRepository;
@@ -82,8 +83,8 @@ public class DoctorServiceTest {
         DoctorsDTO pmResult = doctorService.findDoctorByTime(PM);
 
         assertEquals(1, amResult.getDoctors().size());
-        assertEquals(List.of("09:00-10:00", "10:00-11:00"), amResult.getDoctors().get(0).getAvailableTimes());
-        assertEquals(List.of("13:00-14:00"), pmResult.getDoctors().get(0).getAvailableTimes());
+        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), amResult.getDoctors().get(0).getAvailableTimes());
+        assertEquals(List.of(AvailableTime.SLOT_13_14), pmResult.getDoctors().get(0).getAvailableTimes());
 
         verify(doctorRepository).findByTime(AM);
         verify(doctorRepository).findByTime(PM);
@@ -100,7 +101,7 @@ public class DoctorServiceTest {
 
         assertEquals(1, result.getDoctors().size());
         assertEquals(FULL_NAME, result.getDoctors().get(0).getName());
-        assertEquals(List.of("09:00-10:00", "10:00-11:00"), result.getDoctors().get(0).getAvailableTimes());
+        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.getDoctors().get(0).getAvailableTimes());
 
         verify(doctorRepository).findByNameAndTime(NAME, AM);
     }
@@ -129,7 +130,7 @@ public class DoctorServiceTest {
                 doctorService.filterDoctorByTimeAndSpecialty(AM, SPECIALTY);
 
         assertEquals(1, result.getDoctors().size());
-        assertEquals(List.of("09:00-10:00", "10:00-11:00"), result.getDoctors().get(0).getAvailableTimes());
+        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.getDoctors().get(0).getAvailableTimes());
         assertEquals(SPECIALTY, result.getDoctors().get(0).getSpecialty());
 
         verify(doctorRepository).findByTimeAndSpecialty(AM, SPECIALTY);
@@ -144,7 +145,7 @@ public class DoctorServiceTest {
                 doctorService.filterDoctorByTimeAndSpecialty(PM, SPECIALTY);
 
         assertEquals(1, result.getDoctors().size());
-        assertEquals(List.of("13:00-14:00"), result.getDoctors().get(0).getAvailableTimes());
+        assertEquals(List.of(AvailableTime.SLOT_13_14), result.getDoctors().get(0).getAvailableTimes());
         assertEquals(SPECIALTY, result.getDoctors().get(0).getSpecialty());
 
         verify(doctorRepository).findByTimeAndSpecialty(PM, SPECIALTY);
@@ -161,7 +162,7 @@ public class DoctorServiceTest {
         assertEquals(1, result.getDoctors().size());
         assertEquals(FULL_NAME, result.getDoctors().get(0).getName());
         assertEquals(SPECIALTY, result.getDoctors().get(0).getSpecialty());
-        assertEquals(List.of("13:00-14:00"), result.getDoctors().get(0).getAvailableTimes());
+        assertEquals(List.of(AvailableTime.SLOT_13_14), result.getDoctors().get(0).getAvailableTimes());
 
         verify(doctorRepository).findByNameAndTimeAndSpecialty(NAME, PM, SPECIALTY);
     }
@@ -211,9 +212,9 @@ public class DoctorServiceTest {
         doctor.setPhone("5551012020");
         doctor.setPassword("hashed-password");
         doctor.setAvailableTimes(List.of(
-                "09:00-10:00",
-                "10:00-11:00",
-                "13:00-14:00"
+                AvailableTime.SLOT_09_10,
+                AvailableTime.SLOT_10_11,
+                AvailableTime.SLOT_13_14
         ));
 
         return doctor;

@@ -2,9 +2,11 @@ package com.project.back_end.mappers;
 
 import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.models.Doctor;
 
 import java.util.List;
+import java.util.Set;
 
 public class DoctorsDTOMapper {
 
@@ -21,32 +23,32 @@ public class DoctorsDTOMapper {
             return fromDoctorList(doctorList);
         }
 
-        if (!time.equalsIgnoreCase("AM") && !time.equalsIgnoreCase("PM")) {
+        String timeRequested = time.toUpperCase();
+
+        if (!timeRequested.equals("AM") && !timeRequested.equals("PM")) {
             return fromDoctorList(doctorList);
         }
 
+        Set<AvailableTime> slots =
+                timeRequested.equals("AM")
+                    ? AvailableTime.amTimes()
+                    : AvailableTime.pmTimes();
 
         List<DoctorDTO> doctors = doctorList.stream()
+                .filter(doctor -> doctor.getAvailableTimes().stream()
+                    .anyMatch(slots::contains)
+                )
                 .map(doctor -> {
                     DoctorDTO dto = DoctorMapper.toDTO(doctor);
-                    dto.setAvailableTimes(filterTimes(dto.getAvailableTimes(), time.toUpperCase()));
-
+                    dto.setAvailableTimes(
+                        dto.getAvailableTimes().stream()
+                            .filter(slots::contains)
+                            .toList()
+                    );
                     return dto;
                 })
                 .toList();
 
         return new DoctorsDTO(doctors);
-    }
-
-    private static List<String> filterTimes(List<String> times, String time) {
-        if (time.equalsIgnoreCase("AM")) {
-            return times.stream()
-                    .filter(t -> Integer.parseInt(t.split(":")[0]) < 12)
-                    .toList();
-        } else {
-            return times.stream()
-                    .filter(t -> Integer.parseInt(t.split(":")[0]) >= 12)
-                    .toList();
-        }
     }
 }
