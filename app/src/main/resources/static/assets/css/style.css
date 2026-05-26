@@ -165,7 +165,6 @@
     }
   }
 
-
   .modal {
     display: none;
     position: fixed;
@@ -259,6 +258,7 @@
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: transform 0.2s ease;
+    padding: 0;
   }
 
   .doctor-card:hover {
@@ -266,7 +266,7 @@
   }
 
   .doctor-info {
-    padding: 12px 0;
+    padding: 12px 0 0 0;
     flex-grow: 1;
   }
 
@@ -282,7 +282,7 @@
 
   .doctor-card ul li {
       border-bottom: 1px solid #CCD;
-      padding: 5px;
+      padding: 10px 5px;
   }
 
   .doctor-info p {
@@ -292,9 +292,7 @@
   }
 
   .card-actions {
-    /* background-color: #e28282; */
     background-color: #003e3e;
-
     padding: 10px 20px;
     text-align: center;
   }

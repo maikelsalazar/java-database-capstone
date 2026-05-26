@@ -54,11 +54,11 @@ export function createDoctorCard(doctor) {
         doctorSpecialty,
         email,
         phone,
-        availableTimes,
-        action
+        availableTimes
     );
 
     card.appendChild(doctorInfoDiv);
+    card.appendChild(action);
 
     return card;
 }
