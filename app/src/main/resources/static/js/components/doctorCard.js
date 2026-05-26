@@ -26,7 +26,37 @@ export function createDoctorCard(doctor) {
         availableTimes.appendChild(item);
     });
 
-    doctorInfoDiv.append(doctorName, doctorSpecialty, email, phone, availableTimes);
+    const role = localStorage.getItem("userRole");
+
+    const action = document.createElement("div");
+    switch(role) {
+        case 'admin':
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+
+            action.classList.add("card-actions");
+            action.appendChild(deleteButton);
+        break;
+        case 'patient':
+            const bookButton = document.createElement("button");
+            bookButton.textContent = "Book An Appointment";
+
+            action.classList.add("card-actions");
+            action.appendChild(bookButton);
+        break;
+        default:
+            // nothing intentionally
+        break;
+    }
+
+    doctorInfoDiv.append(
+        doctorName,
+        doctorSpecialty,
+        email,
+        phone,
+        availableTimes,
+        action
+    );
 
     card.appendChild(doctorInfoDiv);
 

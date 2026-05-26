@@ -27,3 +27,50 @@ export async function getDoctors() {
         return [];
     }
 };
+
+export async function saveDoctor(name, specialty, email, password, phone, availableTimes) {
+    const token = localStorage.getItem("token");
+
+    const doctor = { name, specialty, email, password, phone, availableTimes };
+    const globalErrorMessage = document.getElementById("globalErrorMessage");
+
+    try {
+        const response = await fetch(`${DOCTOR_API}/${token}`, {
+          method: "POST",
+          headers: {
+           "Content-Type": "application/json"
+          },
+          body: JSON.stringify(doctor),
+        });
+
+        if (!response.ok) {
+            switch(response.status) {
+                case 400:
+                    const { success, errors } = await response.json();
+
+                    Object.entries(errors).forEach(([field, message]) => {
+                      const fieldMessage = document.getElementById(field + "Message");
+                      fieldMessage.textContent = message;
+                    });
+                break;
+                case 401:
+                    globalErrorMessage.textContent = "Forbidden";
+                break;
+                default:
+                    globalErrorMessage.textContent = "Unknown error";
+                break;
+            }
+            return false;
+        }
+
+        return true;
+    } catch(error) {
+        if (error instanceof TypeError) {
+          globalErrorMessage.textContent = "Cannot connect to server";
+        } else {
+          globalErrorMessage.textContent = "Unexpected internal error";
+       }
+
+       return false;
+    }
+};

@@ -3,6 +3,7 @@ package com.project.back_end.services;
 import com.project.back_end.DTO.AdminLoginDTO;
 import com.project.back_end.DTO.DoctorLoginDTO;
 import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.exceptions.UnauthorizedException;
 import com.project.back_end.models.Admin;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.repo.AdminRepository;
@@ -111,5 +112,11 @@ public class Service {
 
     public boolean validateToken(String userToken, String role) {
         return (tokenService.validateToken(userToken, role));
+    }
+
+    public void validateTokenOrThrow(String userToken, String role) {
+        if (!validateToken(userToken, role)) {
+            throw new UnauthorizedException("Invalid token");
+        }
     }
 }

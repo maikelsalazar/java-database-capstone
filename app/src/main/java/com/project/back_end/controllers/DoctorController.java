@@ -1,8 +1,9 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.DTO.DoctorDTO;
+import com.project.back_end.DTO.DoctorCreateDTO;
 import com.project.back_end.DTO.DoctorLoginDTO;
 import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.security.Role;
 import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
 import jakarta.validation.Valid;
@@ -12,15 +13,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("${api.path}doctors")
 public class DoctorController {
 
-    private DoctorService doctorService;
+    private final DoctorService doctorService;
 
-    private Service service;
+    private final Service service;
 
     public DoctorController(DoctorService doctorService, Service service) {
         this.doctorService = doctorService;
@@ -47,6 +47,7 @@ public class DoctorController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> doctorLogin(@Valid @RequestBody DoctorLoginDTO doctorLogin) {
         String token = service.validateDoctor(doctorLogin);
+
         Map<String, Object> content = new HashMap<>();
         if (token == null) {
             content.put("success", false);
@@ -60,6 +61,19 @@ public class DoctorController {
         content.put("success", true);
         content.put("message","Login successful");
         content.put("token", token);
+
+        return ResponseEntity.ok(content);
+    }
+
+    @PostMapping("/{token}")
+    public ResponseEntity<Map<String, Object>> saveDoctor(@PathVariable String token, @Valid @RequestBody DoctorCreateDTO newDoctorRequest) {
+
+        service.validateTokenOrThrow(token, Role.ADMIN);
+
+        doctorService.saveDoctor(newDoctorRequest);
+
+        Map<String, Object> content = new HashMap<>();
+        content.put("message", "Doctor added successfully");
 
         return ResponseEntity.ok(content);
     }

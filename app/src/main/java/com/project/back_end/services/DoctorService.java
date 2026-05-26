@@ -1,10 +1,14 @@
 package com.project.back_end.services;
 
+import com.project.back_end.DTO.DoctorCreateDTO;
 import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.exceptions.DuplicateEmailException;
+import com.project.back_end.mappers.DoctorDTOMapper;
 import com.project.back_end.mappers.DoctorsDTOMapper;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.repo.AppointmentRepository;
 import com.project.back_end.repo.DoctorRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,17 +18,25 @@ import java.util.List;
 public class DoctorService {
 
     private final DoctorRepository doctorRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DoctorService(DoctorRepository doctorRepository) {
+    public DoctorService(DoctorRepository doctorRepository, PasswordEncoder passwordEncoder) {
         this.doctorRepository = doctorRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void getDoctorAvailability() {
         throw new UnsupportedOperationException("No implemented yet");
     }
 
-    public void saveDoctor() {
-        throw new UnsupportedOperationException("No implemented yet");
+    @Transactional
+    public void saveDoctor(DoctorCreateDTO dto) {
+        if (doctorRepository.existsByEmail(dto.getEmail())) {
+            throw new DuplicateEmailException();
+        }
+
+        Doctor doctor = DoctorDTOMapper.fromCreate(dto, passwordEncoder);
+        doctorRepository.save(doctor);
     }
 
     public void updateDoctor() {

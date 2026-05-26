@@ -9,8 +9,8 @@ public final class Role {
     public static final String PATIENT = "PATIENT";
     public static final String DOCTOR = "DOCTOR";
 
-    public static boolean matchAuthority(String rawAuthority, String authority) {
+    public static boolean matchAuthority(String role, String authority) {
 
-        return authority.equals("ROLE_" + rawAuthority);
+        return authority.equals("ROLE_" + role);
     }
 }
