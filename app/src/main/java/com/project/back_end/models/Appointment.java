@@ -35,7 +35,6 @@ public class Appointment {
     @Column(nullable = false)
     private int status; // 0=scheduled, 1=completed, 2=cancelled
 
-
     public Long getId() {
         return id;
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.back_end.enums.AvailableTime;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,13 @@ public class Doctor {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<AvailableTime> availableTimes;
+
+    @OneToMany(
+            mappedBy = "doctor",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Appointment> appointments = new ArrayList<>();
 
     public Doctor() {
     }
@@ -91,5 +99,12 @@ public class Doctor {
     public void setAvailableTimes(List<AvailableTime> availableTimes) {
         this.availableTimes = availableTimes;
     }
-}
 
+    public List<Appointment> getAppointments() {
+        return appointments;
+    }
+
+    public void setAppointments(List<Appointment> appointments) {
+        this.appointments = appointments;
+    }
+}

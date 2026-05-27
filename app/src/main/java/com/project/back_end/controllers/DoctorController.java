@@ -77,4 +77,16 @@ public class DoctorController {
 
         return ResponseEntity.ok(content);
     }
+
+    @DeleteMapping("/{id}/{token}")
+    public ResponseEntity<Map<String, Object>> deleteDoctor(
+            @PathVariable Long id,
+            @PathVariable String token
+    ) {
+
+        service.validateTokenOrThrow(token, Role.ADMIN);
+        doctorService.deleteDoctor(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }

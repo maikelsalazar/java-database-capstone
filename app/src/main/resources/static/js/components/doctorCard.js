@@ -1,6 +1,9 @@
+import { adminDeleteDoctor } from "./adminDashboard.js";
+
 export function createDoctorCard(doctor) {
     const card = document.createElement("div");
     card.classList.add("doctor-card");
+    card.setAttribute("id", "doctorCard" + doctor.id);
 
     const doctorInfoDiv = document.createElement("div");
     doctorInfoDiv.classList.add("doctor-info");
@@ -33,6 +36,8 @@ export function createDoctorCard(doctor) {
         case 'admin':
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "Delete";
+            deleteButton.dataset.id = doctor.id;
+            deleteButton.addEventListener("click", adminDeleteDoctor);
 
             action.classList.add("card-actions");
             action.appendChild(deleteButton);

@@ -74,3 +74,27 @@ export async function saveDoctor(name, specialty, email, password, phone, availa
        return false;
     }
 };
+
+export async function deleteDoctor(id) {
+    const token = localStorage.getItem("token");
+
+    try {
+            const response = await fetch(`${DOCTOR_API}/${id}/${token}`, {
+              method: "DELETE",
+              headers: {
+               "Content-Type": "application/json"
+              }
+            });
+
+            if (response.ok) return true;
+
+            const { success, message } = await response.json();
+
+            console.log(message);
+
+            return false;
+    } catch(error) {
+        console.error(error);
+        return false;
+    }
+};

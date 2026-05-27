@@ -21,7 +21,11 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -94,14 +98,14 @@ public class DoctorControllerIntegrationTest {
                 """;
 
         mockMvc.perform(post(LOGIN_URI)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(credentials))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.success").isBoolean())
-            .andExpect(jsonPath("$.success").value(true))
-            .andExpect(jsonPath("$.token").isNotEmpty())
-            .andExpect(jsonPath("$.message")
-                    .value("Login successful"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(credentials))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").isBoolean())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(jsonPath("$.message")
+                        .value("Login successful"));
     }
 
     @Test
@@ -123,14 +127,14 @@ public class DoctorControllerIntegrationTest {
                 """;
 
         mockMvc.perform(post(LOGIN_URI)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(credentials))
-            .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("$.success").isBoolean())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.token").doesNotExist())
-            .andExpect(jsonPath("$.message")
-                    .value("Invalid credentials"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(credentials))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").isBoolean())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.token").doesNotExist())
+                .andExpect(jsonPath("$.message")
+                        .value("Invalid credentials"));
     }
 
     @Test
@@ -143,14 +147,14 @@ public class DoctorControllerIntegrationTest {
                 """;
 
         mockMvc.perform(post(LOGIN_URI)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(credentials))
-            .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("$.success").isBoolean())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.token").doesNotExist())
-            .andExpect(jsonPath("$.message")
-                    .value("Invalid credentials"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(credentials))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").isBoolean())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.token").doesNotExist())
+                .andExpect(jsonPath("$.message")
+                        .value("Invalid credentials"));
     }
 
     @Test
@@ -187,10 +191,10 @@ public class DoctorControllerIntegrationTest {
                 """;
 
         mockMvc.perform(post(SAVE_DOCTORS_URI + "/" + adminToken)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(doctorData))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.message").value("Doctor added successfully"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(doctorData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Doctor added successfully"));
 
         assertTrue(doctorRepository.existsByEmail("john.doe@email.com"));
     }
@@ -221,11 +225,11 @@ public class DoctorControllerIntegrationTest {
                 """;
 
         mockMvc.perform(post(SAVE_DOCTORS_URI + "/" + doctorToken)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(doctorData))
-            .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.message").isNotEmpty());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(doctorData))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
     @Test
@@ -246,10 +250,71 @@ public class DoctorControllerIntegrationTest {
                 """;
 
         mockMvc.perform(post(SAVE_DOCTORS_URI + "/xxx.yyy.zzz")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(doctorData))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.errors").exists())
-            .andExpect(jsonPath("$.errors.*").isNotEmpty());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(doctorData))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.*").isNotEmpty());
+    }
+
+    @Test
+    void shouldDeleteADoctor() throws Exception {
+        Doctor doctor = new Doctor();
+        doctor.setName("John Doe");
+        doctor.setEmail("doctor@email.com");
+        doctor.setPhone("5553334444");
+        doctor.setSpecialty("Neurologist");
+        doctor.setPassword(passwordEncoder.encode("doctor@1234"));
+
+        Doctor savedDoctor = doctorRepository.save(doctor);
+        boolean isDoctorSaved = doctorRepository.existsByEmail(savedDoctor.getEmail());
+
+
+        assertTrue(isDoctorSaved);
+
+        mockMvc.perform(delete(SAVE_DOCTORS_URI + "/" + savedDoctor.getId() + "/" + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        assertFalse(doctorRepository.existsByEmail(savedDoctor.getEmail()));
+    }
+
+    @Test
+    void shouldResponseGracefullyWhenDoctorDoesNotExist() throws Exception {
+
+        doctorRepository.deleteById(1L);
+
+        mockMvc.perform(delete(SAVE_DOCTORS_URI + "/1/" + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        assertFalse(doctorRepository.existsById(1L));
+    }
+
+    @Test
+    void shouldNotDeleteADoctorOnBadRequest() throws Exception {
+        mockMvc.perform(delete(SAVE_DOCTORS_URI + "/one/" + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Bad Request"));
+    }
+
+    @Test
+    void shouldNotDeleteADoctorOnInvalidToken() throws Exception {
+        UserDetails doctorUser = User.builder()
+                .username("doctor@email.com")
+                .password("doctor@1234")
+                .roles(Role.DOCTOR)
+                .build();
+
+        String doctorToken = tokenService.generateToken(doctorUser);
+
+
+        mockMvc.perform(delete(SAVE_DOCTORS_URI + "/1/" + doctorToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isNotEmpty());
     }
 }

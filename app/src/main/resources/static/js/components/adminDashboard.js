@@ -1,4 +1,4 @@
-import { getDoctors, saveDoctor } from '../services/doctorServices.js';
+import { getDoctors, saveDoctor, deleteDoctor } from '../services/doctorServices.js';
 import { createDoctorCard } from './doctorCard.js';
 
 function adminResetFilterForm() {
@@ -59,5 +59,14 @@ export async function adminAddDoctor() {
         setTimeout(() => {
             document.getElementById("modal").style.display = "none";
         }, 3000);
+    }
+};
+
+export async function adminDeleteDoctor() {
+    if (confirm("Are you sure you want to delete this doctor")) {
+        if (deleteDoctor(this.dataset.id)) {
+            const doctorCard = document.getElementById("doctorCard" + this.dataset.id);
+            doctorCard.remove();
+        }
     }
 };

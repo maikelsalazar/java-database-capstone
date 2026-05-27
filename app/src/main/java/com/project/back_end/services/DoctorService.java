@@ -50,8 +50,9 @@ public class DoctorService {
         return DoctorsDTOMapper.fromDoctorList(doctorList);
     }
 
-    public void deleteDoctor() {
-        throw new UnsupportedOperationException("No implemented yet");
+    @Transactional
+    public void deleteDoctor(Long id) {
+        doctorRepository.deleteById(id);
     }
 
     public void validateDoctor() {
