@@ -3,6 +3,7 @@ import { getDoctors } from './services/doctorServices.js';
 import { createDoctorCard } from './components/doctorCard.js';
 import { filterDoctors } from './services/doctorServices.js';
 import { bookAppointment } from './services/appointmentRecordService.js';
+import { debounce } from './utils/debounce.js';
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -84,28 +85,24 @@ export function showBookingOverlay(e, doctor, patient) {
   });
 }
 
-
+const debouncedFilter = debounce(filterDoctorsOnChange, 500);
 
 // Filter Input
-document.getElementById("searchBar").addEventListener("input", filterDoctorsOnChange);
+document.getElementById("searchBar").addEventListener("input", debouncedFilter);
 document.getElementById("filterTime").addEventListener("change", filterDoctorsOnChange);
 document.getElementById("filterSpecialty").addEventListener("change", filterDoctorsOnChange);
-
-
 
 function filterDoctorsOnChange() {
   const searchBar = document.getElementById("searchBar").value.trim();
   const filterTime = document.getElementById("filterTime").value;
   const filterSpecialty = document.getElementById("filterSpecialty").value;
 
-
-  const name = searchBar.length > 0 ? searchBar : null;
-  const time = filterTime.length > 0 ? filterTime : null;
-  const specialty = filterSpecialty.length > 0 ? filterSpecialty : null;
+  const name = searchBar.length > 0 ? searchBar : "*";
+  const time = filterTime.length > 0 ? filterTime : "*";
+  const specialty = filterSpecialty.length > 0 ? filterSpecialty : "*";
 
   filterDoctors(name, time, specialty)
-    .then(response => {
-      const doctors = response.doctors;
+    .then(doctors => {
       const contentDiv = document.getElementById("content");
       contentDiv.innerHTML = "";
 
@@ -134,5 +131,4 @@ export function renderDoctorCards(doctors) {
     const card = createDoctorCard(doctor);
     contentDiv.appendChild(card);
   });
-
 }
