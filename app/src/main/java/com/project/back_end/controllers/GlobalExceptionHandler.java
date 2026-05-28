@@ -1,5 +1,6 @@
 package com.project.back_end.controllers;
 
+import com.project.back_end.exceptions.DuplicateEmailException;
 import com.project.back_end.exceptions.UnauthorizedException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,17 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(body);
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateEmail(DuplicateEmailException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("success", false);
+        body.put("message", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(body);
     }
 }

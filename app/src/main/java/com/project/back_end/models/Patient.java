@@ -2,9 +2,6 @@ package com.project.back_end.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "patient")
@@ -14,30 +11,20 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Patient's name cannot be null or blank")
-    @Size(min = 3, max = 100)
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Email
-    @Size(min = 6, max = 100)
     @Column(nullable = false, length = 100, unique = true)
     private String email;
 
-    @NotNull
-    @Size(min = 3, max = 100)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, length = 100)
     private String password;
 
-    @NotBlank
-    @Column(length = 15)
-    @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
+    @Column(nullable = false, length = 15)
     private String phone;
 
-    @NotNull
-    @Size(min = 3, max = 255)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String address;
 
     public Patient() {
