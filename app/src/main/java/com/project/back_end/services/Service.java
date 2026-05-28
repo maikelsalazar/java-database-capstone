@@ -3,38 +3,46 @@ package com.project.back_end.services;
 import com.project.back_end.DTO.AdminLoginDTO;
 import com.project.back_end.DTO.DoctorLoginDTO;
 import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.DTO.PatientLoginDTO;
 import com.project.back_end.exceptions.UnauthorizedException;
 import com.project.back_end.models.Admin;
 import com.project.back_end.models.Doctor;
+import com.project.back_end.models.Patient;
 import com.project.back_end.repo.AdminRepository;
 import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
+import jakarta.validation.Valid;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @org.springframework.stereotype.Service
 public class Service {
 
-    private DoctorService doctorService;
+    private final DoctorService doctorService;
 
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
 
-    private DoctorRepository doctorRepository;
+    private final DoctorRepository doctorRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final PatientRepository patientRepository;
 
-    private CustomUserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
-    private TokenService tokenService;
+    private final CustomUserDetailsService userDetailsService;
+
+    private final TokenService tokenService;
 
     public Service(DoctorService doctorService,
                    AdminRepository adminRepository,
                    DoctorRepository doctorRepository,
+                   PatientRepository patientRepository,
                    PasswordEncoder passwordEncoder,
                    CustomUserDetailsService userDetailsService,
                    TokenService tokenService) {
         this.doctorService = doctorService;
         this.adminRepository = adminRepository;
         this.doctorRepository = doctorRepository;
+        this.patientRepository = patientRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
         this.tokenService = tokenService;
@@ -106,6 +114,22 @@ public class Service {
         if (!valid) return null;
 
         UserDetails user = userDetailsService.buildUser(doctor);
+
+        return tokenService.generateToken(user);
+    }
+
+    public String validatePatient(PatientLoginDTO patientLoginDTO) {
+        Patient patient = patientRepository.findByEmail(patientLoginDTO.getEmail());
+        if (patient == null) return null;
+
+        boolean valid = passwordEncoder.matches(
+            patientLoginDTO.getPassword(),
+            patient.getPassword()
+        );
+
+        if (!valid) return null;
+
+        UserDetails user = userDetailsService.buildUser(patient);
 
         return tokenService.generateToken(user);
     }

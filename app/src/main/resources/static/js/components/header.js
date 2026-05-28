@@ -52,6 +52,13 @@ function renderHeader() {
             <button id="patientSignup" class="adminBtn">Sign Up</button>
         `;
     break;
+    case 'loggedPatient':
+        headerContent += `
+           <button id="home" class="adminBtn" onclick="window.location.href='/pages/loggedPatientDashboard.html'">Home</button>
+           <button id="patientAppointments" class="adminBtn" onclick="window.location.href='/pages/patientAppointments.html'">Appointments</button>
+           <a href="#" onclick="logout()">Logout</a>
+        `;
+    break;
   }
 
   headerContent += `
