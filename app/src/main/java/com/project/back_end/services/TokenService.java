@@ -2,6 +2,7 @@ package com.project.back_end.services;
 
 import com.project.back_end.repo.AdminRepository;
 import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
 import com.project.back_end.security.Role;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -26,6 +27,9 @@ public class TokenService {
 
     @Autowired
     private DoctorRepository doctorRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
@@ -66,14 +70,12 @@ public class TokenService {
         if (email == null) return false;
         if (!Role.matchAuthority(role, tokenRole)) return false;
 
-        switch (role) {
-            case Role.ADMIN:
-                return adminRepository.existsByUsername(email);
-            case Role.DOCTOR:
-                return doctorRepository.existsByEmail(email);
-        }
-
-        return false;
+        return switch (role) {
+            case Role.ADMIN -> adminRepository.existsByUsername(email);
+            case Role.DOCTOR -> doctorRepository.existsByEmail(email);
+            case Role.PATIENT -> patientRepository.existsByEmail(email);
+            default -> false;
+        };
 
     }
 }

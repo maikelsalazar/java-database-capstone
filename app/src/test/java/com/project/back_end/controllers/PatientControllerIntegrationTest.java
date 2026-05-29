@@ -1,13 +1,22 @@
 package com.project.back_end.controllers;
 
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Patient;
+import com.project.back_end.repo.AppointmentRepository;
+import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.PatientRepository;
+import com.project.back_end.security.Role;
+import com.project.back_end.services.Service;
+import com.project.back_end.services.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -16,8 +25,11 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,7 +51,19 @@ public class PatientControllerIntegrationTest {
     private PatientRepository patientRepository;
 
     @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private Service service;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private TokenService tokenService;
 
     @Container
     static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
@@ -56,6 +80,8 @@ public class PatientControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        appointmentRepository.deleteAll();
+        doctorRepository.deleteAll();
         patientRepository.deleteAll();
     }
 
@@ -173,6 +199,84 @@ public class PatientControllerIntegrationTest {
                 .andExpect(jsonPath("$.errors.*").isNotEmpty());
     }
 
+    /* ----------------------------------------------- Appointments ------------------------------------------------ */
+
+    @Test
+    void shouldGetPatientAppointments() throws Exception {
+        Patient savedPatient = patientRepository.save(aPatient());
+        Doctor savedDoctor = doctorRepository.save(aDoctor());
+
+        Appointment appointment = createAnAppointmentAt(savedPatient, savedDoctor, LocalDateTime.now());
+        appointmentRepository.save(appointment);
+
+        String token = getToken(savedPatient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(get(PATIENT_API_URL + "/" + savedPatient.getId() + "/patient/" + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.appointments").isArray())
+                .andExpect(jsonPath("$.appointments[0].doctorId").value(savedDoctor.getId()))
+                .andExpect(jsonPath("$.appointments[0].patientId").value(savedPatient.getId()));
+    }
+
+    @Test
+    void shouldNotGetAppointmentsOfAnotherPatient() throws Exception {
+        Patient patientA = patientRepository.save(aPatient());
+        Patient patientB = patientRepository.save(aDifferentPatient());
+
+        Doctor doctor = doctorRepository.save(aDoctor());
+
+        Appointment appointment = createAnAppointmentAt(patientB, doctor, LocalDateTime.now());
+
+        appointmentRepository.save(appointment);
+
+        String token = getToken(patientA.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(get(PATIENT_API_URL + "/" + patientB.getId() + "/patient/" + token))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenPatientDoesNotExist() throws Exception {
+        Patient patientA = patientRepository.save(aPatient());
+        Patient patientB = patientRepository.save(aDifferentPatient());
+
+        Long patientBId = patientB.getId();
+        patientRepository.deleteById(patientBId);
+
+        String token = getToken(patientA.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(get(PATIENT_API_URL + "/" + patientBId + "/patient/" + token))
+                .andExpect(status().isForbidden());
+    }
+
+    /* ---------------------------------------------- Patient's data ----------------------------------------------- */
+
+    @Test
+    void shouldGetPatientData() throws Exception {
+        Patient patient = patientRepository.save(aPatient());
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(get(PATIENT_API_URL + "/" + token)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.patient.id").value(patient.getId()))
+                .andExpect(jsonPath("$.patient.name").value(patient.getName()))
+                .andExpect(jsonPath("$.patient.email").value(patient.getEmail()))
+                .andExpect(jsonPath("$.patient.phone").value(patient.getPhone()))
+                .andExpect(jsonPath("$.patient.address").value(patient.getAddress()))
+                .andExpect(jsonPath("$.patient.password").doesNotExist());
+    }
+
+    @Test
+    void shouldNotGetPatientDataOnWrongRole() throws Exception {
+        Doctor doctor = doctorRepository.save(aDoctor());
+        String token = getToken(doctor.getEmail(), Role.DOCTOR);
+
+        mockMvc.perform(get(PATIENT_API_URL + "/" + token)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
     /* -------------------------------------------------- Helpers -------------------------------------------------- */
 
     private Patient aPatient() {
@@ -184,6 +288,48 @@ public class PatientControllerIntegrationTest {
         patient.setAddress("Av. 145, NY");
 
         return patient;
+    }
+
+    private Patient aDifferentPatient() {
+        Patient patient = new Patient();
+        patient.setName("Other Patient");
+        patient.setEmail("other@email.com");
+        patient.setPassword(passwordEncoder.encode("patient@1234"));
+        patient.setPhone("999999999");
+        patient.setAddress("Other address");
+
+        return patient;
+    }
+
+    private Doctor aDoctor() {
+        Doctor doctor = new Doctor();
+        doctor.setName("John Doe");
+        doctor.setEmail("doctor@email.com");
+        doctor.setPhone("5553334444");
+        doctor.setSpecialty("Neurologist");
+        doctor.setPassword(passwordEncoder.encode("doctor@1234"));
+
+        return doctor;
+    }
+
+    private Appointment createAnAppointmentAt(Patient patient, Doctor doctor, LocalDateTime at) {
+        Appointment appointment = new Appointment();
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAppointmentTime(at);
+        appointment.setStatus(0);
+
+        return (appointment);
+    }
+
+    private String getToken(String email, String role) {
+        UserDetails patientUser = User.builder()
+                .username(email)
+                .password("test")
+                .roles(role.toUpperCase())
+                .build();
+
+        return tokenService.generateToken(patientUser);
     }
 
     private static String validPatientJson() {

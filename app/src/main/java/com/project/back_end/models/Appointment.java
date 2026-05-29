@@ -1,8 +1,6 @@
 package com.project.back_end.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,12 +24,9 @@ public class Appointment {
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
-    @NotNull
-    @Future(message = "Appointment time must be in the future")
     @Column(nullable = false)
     private LocalDateTime appointmentTime;
 
-    @NotNull
     @Column(nullable = false)
     private int status; // 0=scheduled, 1=completed, 2=cancelled
 

@@ -114,16 +114,32 @@ Scenario: View the list of available doctors
   And each doctor should display name, specialty, and available times
 ```
 
+
+## Search Available Doctors
+
+
+```gherkin
+Feature: Search available doctors
+
+Scenario: Filter doctors by name, specialty, and time
+Given I am on the "Available Doctors" page
+And I see a list of all available doctors
+And I have filters for name, specialty, and available time
+When I enter a doctor name or select a specialty or time
+Then the list should update dynamically
+And I should only see doctors matching the selected criteria
+```
+
+
 ### Registration and login
 
 ```gherkin
-Scenario: Successful patient registration
-  Given I am on the home page
-  When I navigate to the patient registration form
-  And I enter valid patient information
-  And I click the "Register" button
-  Then I should be redirected to "/login"
-  And I should see a confirmation message "Registration successful"
+Scenario: Search doctor's by different criteria
+  Given I am on the list of available doctors page
+  And I see all the doctor availables 
+  And I have filters by name, specialty and time
+  When I change any of those filter
+  Then I should see list of doctor availables meeting the criteria
 ```
 
 ```gherkin

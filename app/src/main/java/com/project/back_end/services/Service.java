@@ -11,7 +11,6 @@ import com.project.back_end.models.Patient;
 import com.project.back_end.repo.AdminRepository;
 import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.PatientRepository;
-import jakarta.validation.Valid;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -123,8 +122,8 @@ public class Service {
         if (patient == null) return null;
 
         boolean valid = passwordEncoder.matches(
-            patientLoginDTO.getPassword(),
-            patient.getPassword()
+                patientLoginDTO.getPassword(),
+                patient.getPassword()
         );
 
         if (!valid) return null;
@@ -135,12 +134,16 @@ public class Service {
     }
 
     public boolean validateToken(String userToken, String role) {
-        return (tokenService.validateToken(userToken, role));
+        return tokenService.validateToken(userToken, role);
     }
 
     public void validateTokenOrThrow(String userToken, String role) {
         if (!validateToken(userToken, role)) {
             throw new UnauthorizedException("Invalid token");
         }
+    }
+
+    public String extractEmailFromToken(String token) {
+        return tokenService.extractEmail(token);
     }
 }

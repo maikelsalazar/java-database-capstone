@@ -19,33 +19,33 @@
 <body onload="renderContent()">
   <div class="container">
     <div class="wrapper">
-      <div id="header"></div>
-      <div class="main-content">
-        <h2>Patient <span>Appointment</span></h2>
-        <input type="text" id="searchBar" class="searchBar" placeholder="Search Bar for custom output" />
-                <div class="filter-wrapper">
-                    <select class="filter-select" id="appointmentFilter">
-                        <option value="allAppointments">All Appointments</option>
-                        <option value="future">Upcoming Appointments</option>
-                        <option value="past">Past Appointments</option>
-                    </select>
-                </div>
-        <table id="patientTable">
-          <thead class="table-header">
-            <tr>
-              <th>Patient Name</th>
-              <th>Doctor Name</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="patientTableBody">
-            <!-- rows will be inserted here dynamically -->
-          </tbody>
-        </table>
-      </div>
-      <div id="footer"></div>
+        <div id="header"></div>
+        <main class="main-content">
+            <h2>Patient <span>Appointment</span></h2>
+            <input type="text" id="searchBar" class="searchBar" placeholder="Search Bar for custom output" />
+            <div id="filters" class="filter-wrapper">
+                <select class="filter-select" id="appointmentFilter">
+                    <option value="allAppointments">All Appointments</option>
+                    <option value="future">Upcoming Appointments</option>
+                    <option value="past">Past Appointments</option>
+                </select>
+            </div>
+            <table id="patientTable">
+              <thead class="table-header">
+                <tr>
+                  <th>Patient Name</th>
+                  <th>Doctor Name</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="patientTableBody">
+                <!-- rows will be inserted here dynamically -->
+              </tbody>
+            </table>
+        </main>
+        <div id="footer"></div>
     </div>
   </div>
 </body>

@@ -1,0 +1,14 @@
+{
+  "id": 1,
+  "doctorId": 2,
+  "doctorName": "John Doe",
+  "patientId": 3,
+  "patientName": "Jane Doe",
+  "patientEmail": "jane.doe@email.com",
+  "patientPhone": "1234567890",
+  "patientAddress": "Av. 12, NY",
+  "status": 1,
+  "appointmentTime": "2025-05-10 10:15:00",
+  "appointmentDate": "2025-05-10",
+  "appointmentTimeOnly": "10:15"
+}

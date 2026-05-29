@@ -1,6 +1,7 @@
 package com.project.back_end.controllers;
 
 import com.project.back_end.exceptions.DuplicateEmailException;
+import com.project.back_end.exceptions.NotAllowedException;
 import com.project.back_end.exceptions.UnauthorizedException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,6 +38,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(body);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<Map<String, Object>> handleNoSuchElement(NoSuchElementException ex) {
+
+        return ResponseEntity
+                .notFound()
+                .build();
+    }
+
+    @ExceptionHandler(NotAllowedException.class)
+    public ResponseEntity<Map<String, Object>> handleNotAllowed(NotAllowedException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

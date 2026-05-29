@@ -1,18 +1,19 @@
 package com.project.back_end.controllers;
 
+import com.project.back_end.DTO.AppointmentDTO;
 import com.project.back_end.DTO.PatientCreateDTO;
+import com.project.back_end.DTO.PatientDTO;
 import com.project.back_end.DTO.PatientLoginDTO;
+import com.project.back_end.security.Role;
 import com.project.back_end.services.PatientService;
 import com.project.back_end.services.Service;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -60,6 +61,39 @@ public class PatientController {
 
         return ResponseEntity
                 .ok(body);
+    }
+
+    @GetMapping("/{token}")
+    public ResponseEntity<Map<String, PatientDTO>> getPatient(@PathVariable String token) {
+        service.validateTokenOrThrow(token, Role.PATIENT);
+
+        String email = service.extractEmailFromToken(token);
+
+        PatientDTO patient = patientService.getPatient(email);
+
+        Map<String, PatientDTO> response = new HashMap<>();
+        response.put("patient", patient);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/patient/{token}")
+    public ResponseEntity<Map<String, Object>> getPatientAppointment(
+            @PathVariable Long id,
+            @PathVariable String token) {
+
+        service.validateTokenOrThrow(token, Role.PATIENT);
+
+        String email = service.extractEmailFromToken(token);
+
+        patientService.validateOwnershipOrThrow(id, email);
+
+        List<AppointmentDTO> patientAppointments =  patientService.getPatientAppointments(id);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("appointments", patientAppointments);
+
+        return ResponseEntity.ok(response);
     }
 }
 
