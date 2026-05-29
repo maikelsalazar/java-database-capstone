@@ -6,7 +6,6 @@ import com.project.back_end.exceptions.DuplicateEmailException;
 import com.project.back_end.mappers.DoctorDTOMapper;
 import com.project.back_end.mappers.DoctorsDTOMapper;
 import com.project.back_end.models.Doctor;
-import com.project.back_end.repo.AppointmentRepository;
 import com.project.back_end.repo.DoctorRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
