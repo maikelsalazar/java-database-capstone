@@ -131,3 +131,5 @@ dmypy.json
 # IDES
 .idea/
 
+# MacOS
+.DS_Store
