@@ -1,6 +1,6 @@
 package com.project.back_end.services;
 
-import com.project.back_end.DTO.AppointmentRequestDTO;
+import com.project.back_end.DTO.AppointmentUpdateDTO;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.exceptions.*;
 import com.project.back_end.models.Appointment;
@@ -22,17 +22,17 @@ public class AppointmentService {
     }
 
     @Transactional
-    public void updateAppointment(AppointmentRequestDTO appointmentRequestDTO, String email) {
-        Appointment appointment = appointmentRepository.findById(appointmentRequestDTO.id())
+    public void updateAppointment(AppointmentUpdateDTO appointmentUpdateDTO, String email) {
+        Appointment appointment = appointmentRepository.findById(appointmentUpdateDTO.id())
                 .orElseThrow(AppointmentNotFoundException::new);
 
         long appointmentId = appointment.getId();
         Doctor doctor = appointment.getDoctor();
         Patient patient = appointment.getPatient();
 
-        validateAppointmentIntegrity(appointmentRequestDTO, appointment, email);
+        validateAppointmentIntegrity(appointmentUpdateDTO, appointment, email);
 
-        LocalDateTime newAppointmentTime = appointmentRequestDTO.appointmentTime();
+        LocalDateTime newAppointmentTime = appointmentUpdateDTO.appointmentTime();
 
         if (!doctor.getAvailableTimes().contains(AvailableTime.fromStartTime(newAppointmentTime))){
             throw new UnavailableDoctorException();
@@ -69,12 +69,12 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
-    private static void validateAppointmentIntegrity(AppointmentRequestDTO appointmentRequestDTO, Appointment appointment, String email) {
-        if (!appointment.getDoctor().getId().equals(appointmentRequestDTO.doctor().id())){
+    private static void validateAppointmentIntegrity(AppointmentUpdateDTO appointmentUpdateDTO, Appointment appointment, String email) {
+        if (!appointment.getDoctor().getId().equals(appointmentUpdateDTO.doctor().id())){
             throw new IllegalAppointmentUpdateException("distinct doctor");
         }
 
-        if (!appointment.getPatient().getId().equals(appointmentRequestDTO.patient().id())){
+        if (!appointment.getPatient().getId().equals(appointmentUpdateDTO.patient().id())){
             throw new IllegalAppointmentUpdateException("distinct patient");
         }
 
