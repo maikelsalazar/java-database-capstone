@@ -76,6 +76,5 @@ public class TokenService {
             case Role.PATIENT -> patientRepository.existsByEmail(email);
             default -> false;
         };
-
     }
 }

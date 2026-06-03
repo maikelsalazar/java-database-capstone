@@ -72,6 +72,4 @@ public class PatientService {
             throw new NotAllowedException();
         }
     }
-
-
 }
