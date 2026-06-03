@@ -1,6 +1,6 @@
 package com.project.back_end.dto;
 
-import com.project.back_end.DTO.AppointmentUpdateDTO;
+import com.project.back_end.DTO.AppointmentRequestDTO;
 import com.project.back_end.DTO.DoctorIdDTO;
 import com.project.back_end.DTO.PatientIdDTO;
 import org.junit.jupiter.api.Test;
@@ -15,16 +15,16 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-public class AppointmentUpdateDTOTest {
+public class AppointmentRequestDTOTest {
 
     @Autowired
-    private JacksonTester<AppointmentUpdateDTO> json;
+    private JacksonTester<AppointmentRequestDTO> json;
 
     @Test
     void appointmentUpdateDTODSerializationTest() throws IOException {
-        AppointmentUpdateDTO appointmentUpdateDTO = anAppointmentUpdateDTO();
+        AppointmentRequestDTO appointmentRequestDTO = anAppointmentRequestDTO();
 
-        JsonContent<AppointmentUpdateDTO> content = json.write(appointmentUpdateDTO);
+        JsonContent<AppointmentRequestDTO> content = json.write(appointmentRequestDTO);
 
         assertThat(content).isEqualToJson("/dto/appointment_update.json");
     }
@@ -45,15 +45,15 @@ public class AppointmentUpdateDTOTest {
                 }
                 """;
 
-        AppointmentUpdateDTO expected = anAppointmentUpdateDTO();
-        AppointmentUpdateDTO actual = json.parseObject(appointmentUpdateJson);
+        AppointmentRequestDTO expected = anAppointmentRequestDTO();
+        AppointmentRequestDTO actual = json.parseObject(appointmentUpdateJson);
 
         assertThat(expected).isEqualTo(actual);
 
     }
 
-    private static AppointmentUpdateDTO anAppointmentUpdateDTO() {
-        return new AppointmentUpdateDTO(1L,
+    private static AppointmentRequestDTO anAppointmentRequestDTO() {
+        return new AppointmentRequestDTO(1L,
                 new DoctorIdDTO(2L),
                 new PatientIdDTO(3L),
                 LocalDateTime.of(2026, 2, 1, 10, 0),
