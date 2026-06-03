@@ -12,6 +12,10 @@ import java.time.LocalTime;
 })
 public class Appointment {
 
+    public static final int STATUS_SCHEDULED = 0;
+    public static final int STATUS_COMPLETED = 1;
+    public static final int STATUS_CANCELED = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -80,6 +84,10 @@ public class Appointment {
 
     public LocalTime getAppointmentTimeOnly() {
         return appointmentTime != null ? appointmentTime.toLocalTime() : null;
+    }
+
+    public boolean isScheduled() {
+        return status == this.STATUS_SCHEDULED;
     }
 }
 

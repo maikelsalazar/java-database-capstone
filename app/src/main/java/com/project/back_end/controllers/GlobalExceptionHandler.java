@@ -1,8 +1,6 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.exceptions.DuplicateEmailException;
-import com.project.back_end.exceptions.NotAllowedException;
-import com.project.back_end.exceptions.UnauthorizedException;
+import com.project.back_end.exceptions.*;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -95,4 +93,49 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT)
                 .body(body);
     }
+
+    @ExceptionHandler(IllegalAppointmentUpdateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalAppointmentUpdate(IllegalAppointmentUpdateException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("success", false);
+        body.put("message", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(body);
+    }
+
+    @ExceptionHandler(AppointmentAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleAppointmentAlreadyExists(AppointmentAlreadyExistsException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("success", false);
+        body.put("message", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(body);
+    }
+
+    @ExceptionHandler(AppointmentNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleAppointmentNotFound(AppointmentNotFoundException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("success", false);
+        body.put("message", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(body);
+    }
+
+    @ExceptionHandler(UnavailableDoctorException.class)
+    public ResponseEntity<Map<String, Object>> handleUnavailableDoctor(UnavailableDoctorException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("success", false);
+        body.put("message", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(body);
+    }
+
 }

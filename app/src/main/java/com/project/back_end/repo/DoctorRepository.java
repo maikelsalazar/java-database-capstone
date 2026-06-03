@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalTime;
 import java.util.List;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
@@ -80,4 +81,13 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
                 )
             """)
     List<Doctor> findByNameAndTimeAndSpecialty(@Param("name") String name, @Param("time") String time, @Param("specialty") String specialty);
+
+    @Query("""
+            SELECT COUNT(t) > 0
+            FROM Doctor d
+            JOIN d.availableTimes t
+            WHERE d.id = :id
+            AND t LIKE CONCAT(:time, '-%')
+            """)
+    boolean hasAvailability(@Param("id") Long id, @Param("time") String time);
 }

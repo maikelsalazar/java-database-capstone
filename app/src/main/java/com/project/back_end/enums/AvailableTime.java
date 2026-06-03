@@ -1,7 +1,10 @@
 package com.project.back_end.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.project.back_end.exceptions.UnavailableDoctorException;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Set;
 
 public enum AvailableTime {
@@ -25,6 +28,20 @@ public enum AvailableTime {
     @JsonValue
     public String getValue() {
         return value;
+    }
+
+    public static AvailableTime fromStartTime(LocalDateTime startDatetime) {
+        LocalTime start = startDatetime.toLocalTime();
+        int hour = start.getHour();
+        int nextHour = start.plusHours(1).getHour();
+
+        String enumName = String.format("SLOT_%02d_%02d", hour, nextHour);
+
+        try {
+            return AvailableTime.valueOf(enumName);
+        } catch (IllegalArgumentException ex) {
+            throw new UnavailableDoctorException();
+        }
     }
 
     public static Set<AvailableTime> amTimes() {
