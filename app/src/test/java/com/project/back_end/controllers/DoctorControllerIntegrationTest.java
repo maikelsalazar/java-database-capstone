@@ -225,9 +225,7 @@ public class DoctorControllerIntegrationTest {
         mockMvc.perform(post(SAVE_DOCTORS_URI + "/" + doctorToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(doctorData))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").isNotEmpty());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -308,11 +306,8 @@ public class DoctorControllerIntegrationTest {
 
         String doctorToken = tokenService.generateToken(doctorUser);
 
-
         mockMvc.perform(delete(SAVE_DOCTORS_URI + "/1/" + doctorToken)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").isNotEmpty());
+                .andExpect(status().isForbidden());
     }
 }

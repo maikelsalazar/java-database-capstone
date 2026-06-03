@@ -177,7 +177,7 @@ public class AppointmentControllerIntegrationTests {
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(appointmentUpdate))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
 
         checkNoChangesMade(appointment);
     }

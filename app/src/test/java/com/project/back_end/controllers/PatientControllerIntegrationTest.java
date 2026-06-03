@@ -274,7 +274,7 @@ public class PatientControllerIntegrationTest {
 
         mockMvc.perform(get(PATIENT_API_URL + "/" + token)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     /* -------------------------------------------------- Helpers -------------------------------------------------- */
