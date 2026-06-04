@@ -52,8 +52,9 @@ export async function adminLoginHandler() {
         });
 
         if (!response.ok) {
+          const result = await response.json();
           loginMessage.classList.add("error");
-          loginMessage.textContent = "Error: " + error;
+          loginMessage.textContent = result.message;
           return;
         }
 
@@ -103,8 +104,9 @@ export async function doctorLoginHandler() {
         });
 
         if (!response.ok) {
+          const result = await response.json();
           loginMessage.classList.add("error");
-          loginMessage.textContent = "Error: " + error;
+          loginMessage.textContent = result.message;
           return;
         }
 

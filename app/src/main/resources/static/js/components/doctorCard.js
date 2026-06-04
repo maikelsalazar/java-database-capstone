@@ -1,7 +1,6 @@
 import { adminDeleteDoctor } from "./adminDashboard.js";
-import { showBookingOverlay } from "../loggedPatient.js";
+import { showBookingOverlay } from "./showBookingOverlay.js";
 import { getPatientData } from "../services/patientServices.js";
-
 
 async function handleBookAnAppointment(e, doctor) {
     const token = localStorage.getItem("token");
