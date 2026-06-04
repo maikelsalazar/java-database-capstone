@@ -1,0 +1,10 @@
+{
+  "doctor": {
+    "id": 1
+  },
+  "patient": {
+    "id": 2
+  },
+  "appointmentTime": "2026-06-03T10:15:00",
+  "status": 0
+}

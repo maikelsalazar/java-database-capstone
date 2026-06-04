@@ -1,4 +1,24 @@
 import { adminDeleteDoctor } from "./adminDashboard.js";
+import { showBookingOverlay } from "../loggedPatient.js";
+import { getPatientData } from "../services/patientServices.js";
+
+
+async function handleBookAnAppointment(e, doctor) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "/login.html";
+        return;
+    }
+
+    const patient = await getPatientData(token);
+
+    if (!patient) {
+        alert("Unable to load patient information");
+        return;
+    }
+
+    showBookingOverlay(e, doctor, patient);
+};
 
 export function createDoctorCard(doctor) {
     const card = document.createElement("div");
@@ -31,6 +51,7 @@ export function createDoctorCard(doctor) {
 
     const role = localStorage.getItem("userRole");
 
+
     const action = document.createElement("div");
     switch(role) {
         case 'admin':
@@ -48,6 +69,17 @@ export function createDoctorCard(doctor) {
 
             action.classList.add("card-actions");
             action.appendChild(bookButton);
+        break;
+        case 'loggedPatient':
+            const bookNowButton = document.createElement("button");
+            bookNowButton.textContent = "Book An Appointment";
+
+            bookNowButton.addEventListener("click", (e) =>
+                handleBookAnAppointment(e, doctor)
+            );
+
+            action.classList.add("card-actions");
+            action.appendChild(bookNowButton);
         break;
         default:
             // nothing intentionally

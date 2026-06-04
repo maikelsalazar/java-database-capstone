@@ -1,5 +1,10 @@
 package com.project.back_end.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.back_end.DTO.AppointmentCreateDTO;
+import com.project.back_end.DTO.AppointmentUpdateDTO;
+import com.project.back_end.DTO.DoctorIdDTO;
+import com.project.back_end.DTO.PatientIdDTO;
 import com.project.back_end.builders.AppointmentBuilder;
 import com.project.back_end.builders.DoctorBuilder;
 import com.project.back_end.builders.PatientBuilder;
@@ -24,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,13 +37,13 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,15 +51,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Testcontainers
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class AppointmentControllerIntegrationTests {
 
     private static final String APPOINTMENTS_API = "/api/appointments";
     private static final List<AvailableTime> AVAILABLE_TIMES = List.of(
             AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11
     );
-
-    private static final DateTimeFormatter DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Autowired
     private MockMvc mockMvc;
@@ -72,6 +76,12 @@ public class AppointmentControllerIntegrationTests {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private Clock clock;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Container
     static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
@@ -94,6 +104,331 @@ public class AppointmentControllerIntegrationTests {
     }
 
     @Test
+    void shouldBookAppointmentSuccessfully() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
+
+        LocalDateTime appointmentTime = at(1);
+
+        AppointmentCreateDTO dto = new AppointmentCreateDTO(
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                appointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
+
+        String createAppointmentJson = objectMapper.writeValueAsString(dto);
+
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").isString())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+
+
+        assertEquals(1, appointmentRepository.count());
+
+        Appointment savedAppointment = appointmentRepository.findAll().get(0);
+
+        assertEquals(doctor.getId(), savedAppointment.getDoctor().getId());
+        assertEquals(patient.getId(), savedAppointment.getPatient().getId());
+        assertEquals(appointmentTime, savedAppointment.getAppointmentTime());
+        assertEquals(
+                Appointment.STATUS_SCHEDULED,
+                savedAppointment.getStatus()
+        );
+    }
+
+    @Test
+    void shouldRejectBookAppointmentWhenUserIsNotAPatient() throws Exception {
+        Doctor anDoctor = DoctorBuilder.aDoctor().build();
+        Patient anPatient = PatientBuilder.aPatient().build();
+
+        Doctor doctor = doctorRepository.save(anDoctor);
+        Patient patient = patientRepository.save(anPatient);
+
+        LocalDateTime appointmentTime = at(1);
+
+        AppointmentCreateDTO dto = new AppointmentCreateDTO(
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                appointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
+
+        String createAppointmentJson = objectMapper.writeValueAsString(dto);
+
+        String doctorToken = getToken(doctor.getEmail(), Role.DOCTOR);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + doctorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isForbidden());
+
+        assertEquals(0, appointmentRepository.count());
+    }
+
+    @Test
+    void shouldRejectBookAppointmentWhenPatientDoesNotMatchToken() throws Exception {
+        Patient patient = patientRepository.save(PatientBuilder.aPatient()
+                .withEmail("an.patient@email.com")
+                .build());
+
+        Patient anotherPatient = patientRepository.save(PatientBuilder.aPatient()
+                .withEmail("another.patient@email.com")
+                .build());
+
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+
+        LocalDateTime appointmentTime = at(1);
+
+        String patientToken = getToken(patient.getEmail(), Role.PATIENT);
+
+        AppointmentCreateDTO anotherPatientDto = new AppointmentCreateDTO(
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(anotherPatient.getId()),
+                appointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + patientToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(anotherPatientDto)))
+                .andExpect(status().isForbidden());
+
+        assertEquals(0, appointmentRepository.count());
+    }
+
+    @Test
+    void shouldReturnNotFoundAndNotBookAppointmentWhenReferencedDoctorDoesNotExist() throws Exception {
+        Doctor anDoctor = DoctorBuilder.aDoctor().build();
+        Patient anPatient = PatientBuilder.aPatient().build();
+
+        Doctor doctor = doctorRepository.save(anDoctor);
+        Patient patient = patientRepository.save(anPatient);
+
+        long deletedDoctorId = doctor.getId();
+
+        doctorRepository.deleteById(deletedDoctorId);
+
+        LocalDateTime appointmentTime = at(1);
+
+        AppointmentCreateDTO dto = new AppointmentCreateDTO(
+                new DoctorIdDTO(deletedDoctorId),
+                new PatientIdDTO(patient.getId()),
+                appointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
+
+        String createAppointmentJson = objectMapper.writeValueAsString(dto);
+
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isString())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+
+
+        assertEquals(0, appointmentRepository.count());
+    }
+
+    @Test
+    void shouldReturnNotFoundAndNotBookAppointmentWhenReferencedPatientDoesNotExist() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient()
+                .withEmail("patient@email.com")
+                .build());
+        Patient anotherPatient = patientRepository.save(PatientBuilder.aPatient()
+                .withEmail("another.patient@email.com")
+                .build());
+
+        long deletedAnotherPatientId = anotherPatient.getId();
+
+        patientRepository.deleteById(deletedAnotherPatientId);
+
+        LocalDateTime appointmentTime = at(1);
+
+        AppointmentCreateDTO dto = new AppointmentCreateDTO(
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(deletedAnotherPatientId),
+                appointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
+
+        String createAppointmentJson = objectMapper.writeValueAsString(dto);
+
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isString())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+
+
+        assertEquals(0, appointmentRepository.count());
+    }
+
+    @Test
+    void shouldNotBookAppointmentWhenDoctorIsUnavailable() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor()
+                .withAvailableTimes(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11))
+                .build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
+
+        LocalDateTime appointmentTime = at(1, 11);
+
+        AppointmentCreateDTO dto = new AppointmentCreateDTO(
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                appointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
+
+        String createAppointmentJson = objectMapper.writeValueAsString(dto);
+
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isString())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+
+
+        assertEquals(0, appointmentRepository.count());
+    }
+
+    @Test
+    void shouldNotBookAppointmentWhenDoctorIsAlreadyBooked() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor()
+                .withAvailableTimes(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11))
+                .build());
+        Patient patientA = patientRepository.save(PatientBuilder.aPatient()
+                .withEmail("patient.a@email.com")
+                .build());
+        Patient patientB = patientRepository.save(PatientBuilder.aPatient()
+                .withEmail("patient.b@email.com")
+                .build());
+
+        LocalDateTime appointmentTime = at(1);
+
+        Appointment existingAppointment = appointmentRepository.save(AppointmentBuilder.anAppointment()
+                .withDoctor(doctor)
+                .withPatient(patientB)
+                .withAppointmentTime(appointmentTime)
+                .build()
+        );
+
+        AppointmentCreateDTO dto = new AppointmentCreateDTO(
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patientA.getId()),
+                appointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
+
+        String createAppointmentJson = objectMapper.writeValueAsString(dto);
+
+        String token = getToken(patientA.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isString())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+
+        assertEquals(1, appointmentRepository.count());
+
+        checkNoChangesMade(existingAppointment);
+    }
+
+    @Test
+    void shouldNotBookAppointmentWhenPatientHasAnotherAppointmentAtRequestedTime() throws Exception {
+        Doctor doctorA = doctorRepository.save(DoctorBuilder.aDoctor()
+                .withEmail("doctor.a@email.com")
+                .build());
+        Doctor doctorB = doctorRepository.save(DoctorBuilder.aDoctor()
+                .withEmail("doctor.b@email.com")
+                .build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
+
+        LocalDateTime appointmentTime = at(1);
+
+        Appointment existingAppointment = appointmentRepository.save(AppointmentBuilder.anAppointment()
+                .withDoctor(doctorB)
+                .withPatient(patient)
+                .withAppointmentTime(appointmentTime)
+                .build()
+        );
+
+        AppointmentCreateDTO dto = new AppointmentCreateDTO(
+                new DoctorIdDTO(doctorA.getId()),
+                new PatientIdDTO(patient.getId()),
+                appointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
+
+        String createAppointmentJson = objectMapper.writeValueAsString(dto);
+
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isString())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+
+        assertEquals(1, appointmentRepository.count());
+
+        checkNoChangesMade(existingAppointment);
+    }
+
+    @Test
+    void shouldNotBookAppointmentWhenRequestedTimeIsInThePast() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
+
+        LocalDateTime appointmentTime = before(1);
+
+        AppointmentCreateDTO dto = new AppointmentCreateDTO(
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                appointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
+
+        String createAppointmentJson = objectMapper.writeValueAsString(dto);
+
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isString())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+
+        assertEquals(0, appointmentRepository.count());
+    }
+
+    @Test
     void shouldUpdateAppointmentSuccessfully() throws Exception {
         Patient anPatient = PatientBuilder.aPatient().build();
         Doctor anDoctor = DoctorBuilder.aDoctor()
@@ -103,43 +438,37 @@ public class AppointmentControllerIntegrationTests {
         Patient patient = patientRepository.save(anPatient);
         Doctor doctor = doctorRepository.save(anDoctor);
 
-        LocalDateTime appointmentDate = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime newAppointmentDate = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime appointmentTime = at(1);
+        LocalDateTime newAppointmentTime = at(2);
 
         Appointment anAppointment = AppointmentBuilder.anAppointment()
                 .withDoctor(doctor)
                 .withPatient(patient)
-                .withAppointmentTime(appointmentDate)
+                .withAppointmentTime(appointmentTime)
                 .build();
 
         Appointment appointment = appointmentRepository.save(anAppointment);
 
-        String appointmentUpdate = """
-                {
-                    "id": %d,
-                    "doctor": {
-                        "id": %d
-                    },
-                    "patient": {
-                        "id": %d
-                    },
-                    "appointmentTime": "%s",
-                    "status": 0
-                }
-                """.formatted(appointment.getId(), doctor.getId(), patient.getId(), newAppointmentDate.format(DATE_TIME_FORMATTER));
+        AppointmentUpdateDTO dto = new AppointmentUpdateDTO(
+                appointment.getId(),
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                newAppointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
 
         String token = getToken(patient.getEmail(), Role.PATIENT);
 
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(appointmentUpdate))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
         Optional<Appointment> appointmentUpdated = appointmentRepository.findById(appointment.getId());
 
         assertTrue(appointmentUpdated.isPresent());
-        assertEquals(newAppointmentDate, appointmentUpdated.get().getAppointmentTime());
+        assertEquals(newAppointmentTime, appointmentUpdated.get().getAppointmentTime());
     }
 
     @Test
@@ -149,8 +478,8 @@ public class AppointmentControllerIntegrationTests {
                 .withAvailableTimes(AVAILABLE_TIMES)
                 .build());
 
-        LocalDateTime appointmentTime = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime newAppointmentTime = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime appointmentTime = at(1);
+        LocalDateTime newAppointmentTime = at(2);
         Appointment appointment = appointmentRepository.save(
                 AppointmentBuilder.anAppointment()
                         .withDoctor(doctor)
@@ -158,39 +487,33 @@ public class AppointmentControllerIntegrationTests {
                         .withAppointmentTime(appointmentTime)
                         .build());
 
-        String appointmentUpdate = """
-                {
-                    "id": %d,
-                    "doctor": {
-                        "id": %d
-                    },
-                    "patient": {
-                        "id": %d
-                    },
-                    "appointmentTime": "%s",
-                    "status": 0
-                }
-                """.formatted(appointment.getId(), doctor.getId(), patient.getId(), newAppointmentTime.format(DATE_TIME_FORMATTER));
+        AppointmentUpdateDTO dto = new AppointmentUpdateDTO(
+                appointment.getId(),
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                newAppointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
 
         String token = getToken(doctor.getEmail(), Role.DOCTOR);
 
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(appointmentUpdate))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isForbidden());
 
         checkNoChangesMade(appointment);
     }
 
     @Test
-    void shouldRejectNonOwnerPatient() throws Exception {
+    void shouldRejectAppointmentUpdateWhenUserIsNotOwner() throws Exception {
         Patient patientA = patientRepository.save(PatientBuilder.aPatient().build());
         Patient patientB = patientRepository.save(PatientBuilder.aPatient()
                 .withEmail("lisa.doe@email.com")
                 .build());
         Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
-        LocalDateTime appointmentTime = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime newAppointmentTime = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime appointmentTime = at(1);
+        LocalDateTime newAppointmentTime = at(2);
         Appointment appointment = appointmentRepository.save(
                 AppointmentBuilder.anAppointment()
                         .withDoctor(doctor)
@@ -198,25 +521,19 @@ public class AppointmentControllerIntegrationTests {
                         .withPatient(patientA)
                         .build());
 
-        String appointmentUpdate = """
-                {
-                    "id": %d,
-                    "doctor": {
-                        "id": %d
-                    },
-                    "patient": {
-                        "id": %d
-                    },
-                    "appointmentTime": "%s",
-                    "status": 0
-                }
-                """.formatted(appointment.getId(), doctor.getId(), patientA.getId(), newAppointmentTime.format(DATE_TIME_FORMATTER));
+        AppointmentUpdateDTO dto = new AppointmentUpdateDTO(
+                appointment.getId(),
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patientA.getId()),
+                newAppointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
 
         String token = getToken(patientB.getEmail(), Role.PATIENT);
 
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(appointmentUpdate))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isForbidden());
 
         checkNoChangesMade(appointment);
@@ -228,37 +545,32 @@ public class AppointmentControllerIntegrationTests {
         Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor()
                 .withAvailableTimes(AVAILABLE_TIMES)
                 .build());
-        LocalDateTime appointmentDate = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime newAppointmentDate = LocalDateTime.now().minusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime appointmentTime = at(1);
+        LocalDateTime newAppointmentTime = before(2);
         Appointment appointment = appointmentRepository.save(
                 AppointmentBuilder.anAppointment()
                         .withPatient(patient)
                         .withDoctor(doctor)
-                        .withAppointmentTime(appointmentDate)
+                        .withAppointmentTime(appointmentTime)
                         .build());
 
-        String appointmentUpdate = """
-                {
-                    "id": %d,
-                    "doctor": {
-                        "id": %d
-                    },
-                    "patient": {
-                        "id": %d
-                    },
-                    "appointmentTime": "%s",
-                    "status": 0
-                }
-                """.formatted(appointment.getId(), doctor.getId(), patient.getId(), newAppointmentDate.format(DATE_TIME_FORMATTER));
+        AppointmentUpdateDTO dto = new AppointmentUpdateDTO(
+                appointment.getId(),
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                newAppointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
 
         String token = getToken(patient.getEmail(), Role.PATIENT);
 
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(appointmentUpdate))
-                .andExpect(status().isConflict())
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value(IllegalAppointmentUpdateException.APPOINTMENT_TIME_ALREADY_PAST));
+                .andExpect(jsonPath("$.message").isString())
+                .andExpect(jsonPath("$.message").isNotEmpty());
 
         checkNoChangesMade(appointment);
     }
@@ -267,35 +579,29 @@ public class AppointmentControllerIntegrationTests {
     void shouldRejectWhenAppointmentHasIllegalStatus() throws Exception {
         Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
         Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
-        LocalDateTime appointmentDate = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime newAppointmentDate = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime appointmentTime = at(1);
+        LocalDateTime newAppointmentTime = at(2);
         Appointment appointment = appointmentRepository.save(
                 AppointmentBuilder.anAppointment()
                         .withDoctor(doctor)
                         .withPatient(patient)
-                        .withAppointmentTime(appointmentDate)
+                        .withAppointmentTime(appointmentTime)
                         .withStatus(Appointment.STATUS_CANCELED)
                         .build());
 
-        String appointmentUpdate = """
-                {
-                    "id": %d,
-                    "doctor": {
-                        "id": %d
-                    },
-                    "patient": {
-                        "id": %d
-                    },
-                    "appointmentTime": "%s",
-                    "status": 0
-                }
-                """.formatted(appointment.getId(), doctor.getId(), patient.getId(), newAppointmentDate.format(DATE_TIME_FORMATTER));
+        AppointmentUpdateDTO dto = new AppointmentUpdateDTO(
+                appointment.getId(),
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                newAppointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
 
         String token = getToken(patient.getEmail(), Role.PATIENT);
 
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(appointmentUpdate))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value(IllegalAppointmentUpdateException.ILLEGAL_APPOINTMENT_STATUS));
@@ -314,48 +620,37 @@ public class AppointmentControllerIntegrationTests {
                 .withAvailableTimes(AVAILABLE_TIMES)
                 .build());
 
-        LocalDateTime appointmentDateOfPatientA = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime appointmentDateOfPatientB = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime newAppointmentDateOfPatientA = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime appointmentTimeOfPatientA = at(1);
+        LocalDateTime appointmentTimeOfPatientB = at(2);
+        LocalDateTime newAppointmentTimeOfPatientA = at(2);
 
         Appointment appointmentOfPatientA = appointmentRepository.save(
                 AppointmentBuilder.anAppointment()
                         .withPatient(patientA)
-                        .withAppointmentTime(appointmentDateOfPatientA)
+                        .withAppointmentTime(appointmentTimeOfPatientA)
                         .withDoctor(doctor)
                         .build());
 
         Appointment appointmentOfPatientB = appointmentRepository.save(
                 AppointmentBuilder.anAppointment()
                         .withPatient(patientB)
-                        .withAppointmentTime(appointmentDateOfPatientB)
+                        .withAppointmentTime(appointmentTimeOfPatientB)
                         .withDoctor(doctor)
                         .build());
 
-        String appointmentUpdate = """
-                {
-                    "id": %d,
-                    "doctor": {
-                        "id": %d
-                    },
-                    "patient": {
-                        "id": %d
-                    },
-                    "appointmentTime": "%s",
-                    "status": 0
-                }
-                """.formatted(
+        AppointmentUpdateDTO dto = new AppointmentUpdateDTO(
                 appointmentOfPatientA.getId(),
-                doctor.getId(),
-                patientA.getId(),
-                newAppointmentDateOfPatientA.format(DATE_TIME_FORMATTER)
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patientA.getId()),
+                newAppointmentTimeOfPatientA,
+                Appointment.STATUS_SCHEDULED
         );
 
         String token = getToken(patientA.getEmail(), Role.PATIENT);
 
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(appointmentUpdate))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value(AppointmentAlreadyExistsException.DOCTOR_ALREADY_BOOKED));
@@ -376,46 +671,35 @@ public class AppointmentControllerIntegrationTests {
                 .withEmail("jane.doe@email.com")
                 .build());
 
-        LocalDateTime appointmentDateA = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime appointmentDateB = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime newAppointmentDateForA = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime appointmentTimeA = at(1);
+        LocalDateTime appointmentTimeB = at(2);
+        LocalDateTime newAppointmentTimeForA = at(2);
 
         Appointment appointmentA = appointmentRepository.save(AppointmentBuilder.anAppointment()
                 .withPatient(patient)
                 .withDoctor(doctorA)
-                .withAppointmentTime(appointmentDateA)
+                .withAppointmentTime(appointmentTimeA)
                 .build());
 
         Appointment appointmentB = appointmentRepository.save(AppointmentBuilder.anAppointment()
                 .withPatient(patient)
                 .withDoctor(doctorB)
-                .withAppointmentTime(appointmentDateB)
+                .withAppointmentTime(appointmentTimeB)
                 .build());
 
-        String appointmentUpdate = """
-                {
-                    "id": %d,
-                    "doctor": {
-                        "id": %d
-                    },
-                    "patient": {
-                        "id": %d
-                    },
-                    "appointmentTime": "%s",
-                    "status": 0
-                }
-                """.formatted(
+        AppointmentUpdateDTO dto = new AppointmentUpdateDTO(
                 appointmentA.getId(),
-                doctorA.getId(),
-                patient.getId(),
-                newAppointmentDateForA.format(DATE_TIME_FORMATTER)
+                new DoctorIdDTO(doctorA.getId()),
+                new PatientIdDTO(patient.getId()),
+                newAppointmentTimeForA,
+                Appointment.STATUS_SCHEDULED
         );
 
         String token = getToken(patient.getEmail(), Role.PATIENT);
 
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(appointmentUpdate))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value(AppointmentAlreadyExistsException.PATIENT_HAS_ANOTHER_APPOINTMENT));
@@ -428,43 +712,32 @@ public class AppointmentControllerIntegrationTests {
     void shouldReturnNotFoundWhenAppointmentDoesNotExist() throws Exception {
         Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
         Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
-        LocalDateTime appointmentDate = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime appointmentTime = at(1);
+        LocalDateTime newAppointmentTime = at(2);
 
-        LocalDateTime newAppointmentDate = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
         Appointment appointment = appointmentRepository.save(AppointmentBuilder.anAppointment()
                 .withDoctor(doctor)
                 .withPatient(patient)
-                .withAppointmentTime(appointmentDate)
+                .withAppointmentTime(appointmentTime)
                 .build()
         );
 
         long deletedAppointmentId = appointment.getId();
         appointmentRepository.delete(appointment);
-        ;
 
-        String appointmentUpdate = """
-                {
-                    "id": %d,
-                    "doctor": {
-                        "id": %d
-                    },
-                    "patient": {
-                        "id": %d
-                    },
-                    "appointmentTime": "%s",
-                    "status": 0
-                }
-                """.formatted(
+        AppointmentUpdateDTO dto = new AppointmentUpdateDTO(
                 deletedAppointmentId,
-                doctor.getId(),
-                patient.getId(),
-                newAppointmentDate.format(DATE_TIME_FORMATTER));
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                newAppointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
 
         String token = getToken(patient.getEmail(), Role.PATIENT);
 
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(appointmentUpdate))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
 
         Optional<Appointment> appointmentUpdated = appointmentRepository.findById(deletedAppointmentId);
@@ -476,33 +749,27 @@ public class AppointmentControllerIntegrationTests {
     void shouldNotUpdateAppointmentWhenDoctorIsUnavailable() throws Exception {
         Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
         Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
-        LocalDateTime appointmentDate = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime newAppointmentDate = LocalDateTime.now().plusDays(1).withHour(15).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime appointmentTime = at(1, 10);
+        LocalDateTime newAppointmentTime = at(1, 15);
         Appointment appointment = appointmentRepository.save(AppointmentBuilder.anAppointment()
                 .withDoctor(doctor)
                 .withPatient(patient)
-                .withAppointmentTime(appointmentDate)
+                .withAppointmentTime(appointmentTime)
                 .build());
 
-        String appointmentUpdate = """
-                {
-                    "id": %d,
-                    "doctor": {
-                        "id": %d
-                    },
-                    "patient": {
-                        "id": %d
-                    },
-                    "appointmentTime": "%s",
-                    "status": 0
-                }
-                """.formatted(appointment.getId(), doctor.getId(), patient.getId(), newAppointmentDate.format(DATE_TIME_FORMATTER));
+        AppointmentUpdateDTO dto = new AppointmentUpdateDTO(
+                appointment.getId(),
+                new DoctorIdDTO(doctor.getId()),
+                new PatientIdDTO(patient.getId()),
+                newAppointmentTime,
+                Appointment.STATUS_SCHEDULED
+        );
 
         String token = getToken(patient.getEmail(), Role.PATIENT);
 
         mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(appointmentUpdate))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value(UnavailableDoctorException.UNAVAILABLE_DOCTOR));
@@ -511,18 +778,14 @@ public class AppointmentControllerIntegrationTests {
         checkNoChangesMade(appointment);
     }
 
-    private void checkNoChangesMade(Appointment appointment) {
-        Optional<Appointment> appointmentNotUpdatedFromDb = appointmentRepository.findById(appointment.getId());
+    private void checkNoChangesMade(Appointment original) {
+        Appointment persisted = appointmentRepository.findById(original.getId()).orElseThrow();
 
-        assertTrue(appointmentNotUpdatedFromDb.isPresent());
-
-        Appointment appointmentNotUpdated = appointmentNotUpdatedFromDb.get();
-
-        assertEquals(appointment.getId(), appointmentNotUpdated.getId());
-        assertEquals(appointment.getAppointmentTime(), appointmentNotUpdated.getAppointmentTime());
-        assertEquals(appointment.getDoctor().getId(), appointmentNotUpdated.getDoctor().getId());
-        assertEquals(appointment.getPatient().getId(), appointmentNotUpdated.getPatient().getId());
-        assertEquals(appointment.getStatus(), appointmentNotUpdated.getStatus());
+        assertEquals(original.getId(), persisted.getId());
+        assertEquals(original.getAppointmentTime(), persisted.getAppointmentTime());
+        assertEquals(original.getDoctor().getId(), persisted.getDoctor().getId());
+        assertEquals(original.getPatient().getId(), persisted.getPatient().getId());
+        assertEquals(original.getStatus(), persisted.getStatus());
     }
 
     private String getToken(String email, String role) {
@@ -533,5 +796,32 @@ public class AppointmentControllerIntegrationTests {
                 .build();
 
         return tokenService.generateToken(patientUser);
+    }
+
+    private LocalDateTime at(int days) {
+        return LocalDateTime.now(clock)
+                .plusDays(days)
+                .withHour(10)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+    }
+
+    private LocalDateTime at(int days, int hour) {
+        return LocalDateTime.now(clock)
+                .plusDays(days)
+                .withHour(hour)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+    }
+
+    private LocalDateTime before(int days) {
+        return LocalDateTime.now(clock)
+                .minusDays(days)
+                .withHour(10)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
     }
 }
