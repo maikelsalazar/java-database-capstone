@@ -39,12 +39,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,6 +58,8 @@ public class AppointmentControllerIntegrationTests {
     private static final List<AvailableTime> AVAILABLE_TIMES = List.of(
             AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11
     );
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
     private MockMvc mockMvc;
@@ -776,6 +778,201 @@ public class AppointmentControllerIntegrationTests {
 
 
         checkNoChangesMade(appointment);
+    }
+
+    @Test
+    void shouldGetAllDoctorAppointmentsOfTheSpecifiedDate() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
+        LocalDateTime appointmentTime = at(1);
+
+        Appointment appointment = appointmentRepository.save(
+                AppointmentBuilder.anAppointment()
+                        .withDoctor(doctor)
+                        .withPatient(patient)
+                        .withAppointmentTime(appointmentTime)
+                        .build()
+        );
+
+        appointmentRepository.save(
+                AppointmentBuilder.anAppointment()
+                        .withDoctor(doctor)
+                        .withPatient(patient)
+                        .withAppointmentTime(appointmentTime.plusDays(2))
+                        .build()
+        );
+
+
+        String specifiedDate = appointmentTime.toLocalDate().format(DATE_FORMATTER);
+        String token = getToken(doctor.getEmail(), Role.DOCTOR);
+
+        mockMvc.perform(get(APPOINTMENTS_API + "/" + specifiedDate + "/" + token)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.appointments").exists())
+                .andExpect(jsonPath("$.appointments").isArray())
+                .andExpect(jsonPath("$.appointments.length()").value(1))
+                .andExpect(jsonPath("$.appointments[0].appointmentId").value(appointment.getId()))
+                .andExpect(jsonPath("$.appointments[0].doctorId").value(doctor.getId()))
+                .andExpect(jsonPath("$.appointments[0].patientId").value(patient.getId()))
+                .andExpect(jsonPath("$.appointments[0].patientName").value(patient.getName()))
+                .andExpect(jsonPath("$.appointments[0].patientPhone").value(patient.getPhone()))
+                .andExpect(jsonPath("$.appointments[0].patientEmail").value(patient.getEmail()));
+    }
+
+    @Test
+    void shouldReturnEmptyAppointmentListWhenDoctorHasNoAppointmentsAtTheSpecifiedDate() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+
+        String specifiedDate = at(1).toLocalDate().format(DATE_FORMATTER);
+        String token = getToken(doctor.getEmail(), Role.DOCTOR);
+
+        mockMvc.perform(get(APPOINTMENTS_API + "/" + specifiedDate + "/" + token)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.appointments").exists())
+                .andExpect(jsonPath("$.appointments").isArray())
+                .andExpect(jsonPath("$.appointments").isEmpty());
+    }
+
+    @Test
+    void shouldReturnBadRequestOnInvalidDateFormat() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+
+        String specifiedDate = at(1).toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        String token = getToken(doctor.getEmail(), Role.DOCTOR);
+
+        mockMvc.perform(get(APPOINTMENTS_API + "/" + specifiedDate + "/" + token)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenUserIsNotADoctor() throws Exception {
+        String specifiedDate = at(1).toLocalDate().format(DATE_FORMATTER);
+        String token = getToken(PatientBuilder.aPatient().build().getEmail(), Role.PATIENT);
+
+        mockMvc.perform(get(APPOINTMENTS_API + "/" + specifiedDate + "/" + token)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenAuthenticatedDoctorDoesNotExist() throws Exception {
+        String specifiedDate = at(1).toLocalDate().format(DATE_FORMATTER);
+        String token = getToken("missing.doctor@email.com", Role.DOCTOR);
+
+        mockMvc.perform(get(APPOINTMENTS_API + "/" + specifiedDate + "/" + token)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldGetAllDoctorAppointmentsOfTheSpecifiedDateAndContainsName() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient()
+                .withName("Jane Doe")
+                .build());
+        LocalDateTime appointmentTime = at(1);
+
+        Appointment appointment = appointmentRepository.save(
+                AppointmentBuilder.anAppointment()
+                        .withDoctor(doctor)
+                        .withPatient(patient)
+                        .withAppointmentTime(appointmentTime)
+                        .build()
+        );
+
+        appointmentRepository.save(
+                AppointmentBuilder.anAppointment()
+                        .withDoctor(doctor)
+                        .withPatient(patient)
+                        .withAppointmentTime(appointmentTime.plusDays(2))
+                        .build()
+        );
+
+        String specifiedDate = appointmentTime.toLocalDate().format(DATE_FORMATTER);
+        String token = getToken(doctor.getEmail(), Role.DOCTOR);
+
+        mockMvc.perform(get(APPOINTMENTS_API + "/" + specifiedDate + "/search/jane/" + token)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.appointments").exists())
+                .andExpect(jsonPath("$.appointments").isArray())
+                .andExpect(jsonPath("$.appointments.length()").value(1))
+                .andExpect(jsonPath("$.appointments[0].appointmentId").value(appointment.getId()))
+                .andExpect(jsonPath("$.appointments[0].doctorId").value(doctor.getId()))
+                .andExpect(jsonPath("$.appointments[0].patientId").value(patient.getId()))
+                .andExpect(jsonPath("$.appointments[0].patientName").value(patient.getName()))
+                .andExpect(jsonPath("$.appointments[0].patientPhone").value(patient.getPhone()))
+                .andExpect(jsonPath("$.appointments[0].patientEmail").value(patient.getEmail()));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoAppointmentsMatchPatientNameFilter() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient()
+                .withName("Jane Doe")
+                .build());
+        LocalDateTime appointmentTime = at(1);
+
+        appointmentRepository.save(
+                AppointmentBuilder.anAppointment()
+                        .withDoctor(doctor)
+                        .withPatient(patient)
+                        .withAppointmentTime(appointmentTime)
+                        .build());
+
+        String specifiedDate = appointmentTime.toLocalDate().format(DATE_FORMATTER);
+        String token = getToken(doctor.getEmail(), Role.DOCTOR);
+
+        mockMvc.perform(get(APPOINTMENTS_API + "/" + specifiedDate + "/search/john/" + token)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.appointments").exists())
+                .andExpect(jsonPath("$.appointments").isArray())
+                .andExpect(jsonPath("$.appointments").isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmptyWhenNoAppointmentsMatchDateAndPatientName() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+        Patient patientA = patientRepository.save(PatientBuilder.aPatient()
+                .withName("Jane Doe")
+                .withEmail("jane.doe@email.com")
+                .build());
+
+        Patient patientB = patientRepository.save(PatientBuilder.aPatient()
+                .withName("John Doe")
+                .withEmail("john.doe@email.com")
+                .build());
+
+        LocalDateTime appointmentTimeA = at(1);
+        LocalDateTime appointmentTimeB = at(2);
+
+        appointmentRepository.save(
+                AppointmentBuilder.anAppointment()
+                        .withDoctor(doctor)
+                        .withPatient(patientA)
+                        .withAppointmentTime(appointmentTimeA)
+                        .build());
+
+        appointmentRepository.save(
+                AppointmentBuilder.anAppointment()
+                        .withDoctor(doctor)
+                        .withPatient(patientB)
+                        .withAppointmentTime(appointmentTimeB)
+                        .build());
+
+        String specifiedDate = appointmentTimeA.toLocalDate().format(DATE_FORMATTER);
+        String token = getToken(doctor.getEmail(), Role.DOCTOR);
+
+        mockMvc.perform(get(APPOINTMENTS_API + "/" + specifiedDate + "/search/john/" + token)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.appointments").exists())
+                .andExpect(jsonPath("$.appointments").isArray())
+                .andExpect(jsonPath("$.appointments").isEmpty());
     }
 
     private void checkNoChangesMade(Appointment original) {

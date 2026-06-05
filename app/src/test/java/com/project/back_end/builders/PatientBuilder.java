@@ -14,6 +14,11 @@ public class PatientBuilder {
         return new PatientBuilder();
     }
 
+    public PatientBuilder withName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public PatientBuilder withEmail(String email) {
         this.email = email;
         return this;

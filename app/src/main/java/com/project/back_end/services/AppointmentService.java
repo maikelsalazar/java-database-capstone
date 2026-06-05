@@ -2,8 +2,10 @@ package com.project.back_end.services;
 
 import com.project.back_end.DTO.AppointmentCreateDTO;
 import com.project.back_end.DTO.AppointmentUpdateDTO;
+import com.project.back_end.DTO.DoctorAppointmentDTO;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.exceptions.*;
+import com.project.back_end.mappers.DoctorAppointmentDTOMapper;
 import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Patient;
@@ -14,7 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AppointmentService {
@@ -73,6 +79,35 @@ public class AppointmentService {
         newAppointment.setStatus(Appointment.STATUS_SCHEDULED);
 
         return newAppointment;
+    }
+
+    @Transactional(readOnly = true)
+    public List<DoctorAppointmentDTO> getAppointmentsByDate(LocalDate appointmentDate, String email) {
+        return getAppointments(appointmentDate, email, Optional.empty());
+    }
+
+    @Transactional(readOnly = true)
+    public List<DoctorAppointmentDTO> getAppointmentsByDateAndName(LocalDate appointmentDate, String name, String email) {
+        return getAppointments(appointmentDate, email, Optional.ofNullable(name));
+    }
+
+    private List<DoctorAppointmentDTO> getAppointments(LocalDate appointmentDate, String email, Optional<String> patientName) {
+        Doctor doctor = doctorRepository.findByEmail(email);
+        if (doctor == null) {
+            throw new DoctorNotFoundException();
+        }
+
+        LocalDateTime start = appointmentDate.atStartOfDay();
+        LocalDateTime end = appointmentDate.atTime(LocalTime.MAX);
+
+        String name = patientName.orElse("").trim();
+
+        List<Appointment> appointments =
+                name.isEmpty()
+                ? appointmentRepository.findByDoctorIdAndAppointmentTimeBetween(doctor.getId(), start, end)
+                : appointmentRepository.findByDoctorIdAndPatientNameContainingAndAppointmentTimeBetween(doctor.getId(), name, start, end);
+
+        return DoctorAppointmentDTOMapper.fromList(appointments);
     }
 
     private Appointment validateAppointmentUpdate(AppointmentUpdateDTO appointmentUpdateDTO, String email) {

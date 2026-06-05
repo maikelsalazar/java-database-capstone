@@ -5,7 +5,6 @@ import com.project.back_end.DTO.DoctorLoginDTO;
 import com.project.back_end.DTO.DoctorsDTO;
 import com.project.back_end.DTO.PatientLoginDTO;
 import com.project.back_end.exceptions.NotAllowedException;
-import com.project.back_end.exceptions.UnauthorizedException;
 import com.project.back_end.models.Admin;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Patient;
