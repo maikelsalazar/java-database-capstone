@@ -1,62 +1,22 @@
-# [Feature Title]
+# User Story Template
 
-**Priority:** [High | Medium | Low]  
-**Story Points:** [Number]
-
----
-
-## User Story
+**Title:**
 _As a [user role], I want [feature/goal], so that [reason]._
 
----
-
-## Feature (Gherkin)
+**Feature (Gherkin)**
 ```gherkin
-Feature: [Feature name]
-
-Scenario: [Main scenario]
+Feature: Main Feature
   Given ...
   When ...
   Then ...
-```  
-
-## Acceptance Criteria
-### 1. [Criteria Name]
-- Rule 1
-- Rule 2
-### 2. [Criteria 2]
-- Rule 1
-- Rule 2
-### 3. [Criteria 3]
-- Rule 1
-- Rule 2
-
-## Data Constraints (if applicable)
-- Constraint 1
-- Constraint 2
-
-## Functional Behavior (optional)
-- Functional Behavior 1
-- Functional Behavior 2
-
-## Edge cases (Optional)
-```gherkin
-Scenario: [Edge case name]
-  When ...
-  Then ...
 ```
 
-## API Contract (Backend) (Optional)
-**Request**
-```http
-GET /endpoint
-```
-**Response**
-```json
-{
-  "example": "data"
-}
-```
+**Acceptance Criteria:**
+1. [Criteria 1]
+2. [Criteria 2]
+3. [Criteria 3]
 
-## Additional Notes (Optional)
-- [Only if truly necessary]
+**Priority:** [High/Medium/Low]
+**Story Points:** [Estimated Effort in Points]
+**Notes:**
+- [Additional information or edge cases]
