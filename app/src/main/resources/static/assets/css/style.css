@@ -402,6 +402,10 @@
   color: #F00;
 }
 
+.warning {
+  color: #846f0f;
+}
+
 .success {
    background-color: #198754;
    color: #FFF;

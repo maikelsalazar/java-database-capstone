@@ -56,6 +56,7 @@ export function openModal(type) {
   } else if (type === 'patientLogin') {
     modalContent = `
         <h2>Patient Login</h2>
+        <span id="message"></span>
         <input type="text" id="email" placeholder="Email" class="input-field">
         <input type="password" id="password" placeholder="Password" class="input-field">
         <button class="dashboard-btn" id="loginBtn">Login</button>
@@ -75,7 +76,7 @@ export function openModal(type) {
   } else if (type === 'adminLogin') {
     modalContent = `
         <h2>Admin Login</h2>
-        <span id="loginMessage"></span>
+        <span id="message"></span>
         <input type="text" id="username" name="username" autocomplete="off" placeholder="Username" class="input-field">
         <input type="password" id="password" name="password" placeholder="Password" class="input-field">
         <button class="dashboard-btn" id="adminLoginSubmitBtn" >Login</button>
@@ -83,7 +84,7 @@ export function openModal(type) {
   } else if (type === 'doctorLogin') {
     modalContent = `
         <h2>Doctor Login</h2>
-        <span id="loginMessage"></span>
+        <span id="message"></span>
         <input type="text" id="email" placeholder="Email" class="input-field">
         <input type="password" id="password" placeholder="Password" class="input-field">
         <button class="dashboard-btn" id="doctorLoginSubmitBtn" >Login</button>

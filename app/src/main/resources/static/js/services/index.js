@@ -4,39 +4,46 @@ import { API_BASE_URL } from "../config/config.js";
 const ADMIN_API = `${API_BASE_URL}/admin/login`;
 const DOCTOR_API = `${API_BASE_URL}/doctors/login`;
 
-const adminLogin = document.getElementById("adminLoginBtn");
-const doctorLogin = document.getElementById("doctorLoginBtn");
+document.addEventListener("DOMContentLoaded", () => {
+    const adminLogin = document.getElementById("adminLoginBtn");
+    const doctorLogin = document.getElementById("doctorLoginBtn");
 
-if (adminLogin) {
-    adminLogin.addEventListener("click", () => openModal("adminLogin"));
-}
 
-if (doctorLogin) {
-    doctorLogin.addEventListener("click", () => openModal("doctorLogin"));
+    if (adminLogin) {
+        adminLogin.addEventListener("click", () => openModal("adminLogin"));
+    }
+
+    if (doctorLogin) {
+        doctorLogin.addEventListener("click", () => openModal("doctorLogin"));
+    }
+});
+
+function showMessage(type, message) {
+    const messageElement = document.getElementById("message");
+
+    if (!messageElement) {
+        console.error("Message element does not exist");
+        return;
+    }
+
+    messageElement.className = type;
+    messageElement.textContent = message;
 }
 
 export async function adminLoginHandler() {
-    const tryUsername = document.getElementById("username")?.value;
-    const tryPassword = document.getElementById("password")?.value;
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
 
-    if (tryUsername === undefined) {
-        console.log("Username field does not exist");
+    const username = usernameInput?.value.trim() || "";
+    const password = passwordInput?.value.trim() || "";
+
+    if (username.length < 3 || username.length > 100) {
+        showMessage("warning", "Username must have between 3 and 100 chars");
         return;
     }
 
-    if (tryPassword === undefined) {
-        console.log("Password field does not exist");
-        return;
-    }
-
-    const username = tryUsername.trim();
-    const password = tryPassword.trim();
-
-    const loginMessage = document.getElementById("loginMessage");
-
-    if (username === "" || password === "") {
-        loginMessage.classList.add("error");
-        loginMessage.textContent = "Please enter both username and password";
+    if (password.length < 8 || password.length > 15) {
+        showMessage("warning", "Password must have between 8 and 15 chars");
         return;
     }
 
@@ -52,9 +59,36 @@ export async function adminLoginHandler() {
         });
 
         if (!response.ok) {
-          const result = await response.json();
-          loginMessage.classList.add("error");
-          loginMessage.textContent = result.message;
+          let result = {};
+
+          try {
+            const text = await response.text();
+            result = text ? JSON.parse(text) : {};
+          } catch (e) {
+            console.error("Failed to parse JSON response:", e);
+            showMessage("error", "Invalid server response");
+            return;
+          }
+
+          if (result.message) {
+            showMessage("error", result.message);
+            return;
+          }
+
+          const entries = Object.entries(result?.errors ?? {});
+
+          if (entries.length > 0) {
+            const message = entries
+              .map(([field, error]) => `${field}: ${error}`)
+              .join(", ");
+
+            showMessage("error", message);
+            return;
+          }
+
+          console.error(result);
+
+          showMessage("error", "An unexpected error occurred");
           return;
         }
 
@@ -62,8 +96,7 @@ export async function adminLoginHandler() {
         setTokenAndRole(data.token, "admin");
     } catch(error) {
         console.error("Error occurred: " + error);
-        loginMessage.classList.add("error");
-        loginMessage.textContent = "Error: " + error;
+        showMessage("error", error?.message || "Network error");
     }
 };
 
