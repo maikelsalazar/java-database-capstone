@@ -1,8 +1,11 @@
 // patientAppointment.js
-import { getPatientAppointments, getPatientData, filterAppointments } from "./services/patientServices.js";
+import { getPatientAppointments, getPatientData, filterAppointments } from './services/patientServices.js';
+import { getToken } from "./util.js";
+
+renderContent();
 
 const tableBody = document.getElementById("patientTableBody");
-const token = localStorage.getItem("token");
+const token = getToken();
 
 let allAppointments = [];
 let filteredAppointments = [];
@@ -11,6 +14,7 @@ let patientId = null;
 document.addEventListener("DOMContentLoaded", initializePage);
 
 async function initializePage() {
+
   try {
     if (!token) throw new Error("No token found");
 
