@@ -1,3 +1,5 @@
+import { bookAppointment } from '../services/appointmentRecordService.js';
+
 export function showBookingOverlay(e, doctor, patient) {
   const button = e.target;
   const rect = button.getBoundingClientRect();

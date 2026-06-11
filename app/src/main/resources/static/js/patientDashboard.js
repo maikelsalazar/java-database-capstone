@@ -4,26 +4,24 @@ import { openModal } from './components/modals.js';
 import { createDoctorCard } from './components/doctorCard.js';
 import { filterDoctors } from './services/doctorServices.js';
 import { patientSignup, patientLogin } from './services/patientServices.js';
+import { setTokenAndRole } from './util.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   loadDoctorCards();
-});
 
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("patientSignup");
-  if (btn) {
-    btn.addEventListener("click", () => openModal("patientSignup"));
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
+  const signupBtn = document.getElementById("patientSignup");
   const loginBtn = document.getElementById("patientLogin")
+
+  if (signupBtn) {
+    signupBtn.addEventListener("click", () => openModal("patientSignup"));
+  }
+
   if (loginBtn) {
     loginBtn.addEventListener("click", () => {
       openModal("patientLogin")
     })
   }
-})
+});
 
 function loadDoctorCards() {
   getDoctors()
@@ -115,31 +113,77 @@ window.signupPatient = async function () {
   }
 };
 
-window.loginPatient = async function () {
-  try {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+function showMessage(type, message) {
+    const messageElement = document.getElementById("message");
 
-    const data = {
-      email,
-      password
+    if (!messageElement) {
+        console.error("Message element does not exist");
+        return;
     }
-    console.log("loginPatient :: ", data)
-    const response = await patientLogin(data);
-    console.log("Status Code:", response.status);
-    console.log("Response OK:", response.ok);
-    if (response.ok) {
-      const result = await response.json();
-      console.log(result);
-      selectRole('loggedPatient');
-      localStorage.setItem('token', result.token)
-      window.location.href = '/pages/loggedPatientDashboard.html';
-    } else {
-      alert('❌ Invalid credentials!');
-    }
+
+    messageElement.className = type;
+    messageElement.textContent = message;
+}
+
+window.loginPatient = async function () {
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+
+  const email = emailInput?.value.trim() || "";
+  const password = passwordInput?.value.trim() || "";
+
+  if (email.length < 3 || email.length > 100) {
+      showMessage("warning", "Email must have between 3 and 100 chars");
+      return;
   }
-  catch (error) {
-    alert("❌ Failed to Login : ", error);
-    console.log("Error :: loginPatient :: ", error)
+
+  if (password.length < 8 || password.length > 15) {
+      showMessage("warning", "Password must have between 8 and 15 chars");
+      return;
+  }
+
+  const credentials = { email, password };
+
+  try {
+    const response = await patientLogin(credentials);
+    if (!response.ok) {
+      let result = {};
+      try {
+        const text = await response.text();
+        result = text ? JSON.parse(text) : {};
+      } catch (e) {
+        console.error("Failed to parse JSON response:", e);
+        showMessage("error", "Invalid server response");
+        return;
+      }
+
+      if (result.message) {
+        showMessage("error", result.message);
+        return;
+      }
+
+      const entries = Object.entries(result?.errors ?? {});
+
+      if (entries.length > 0) {
+        const message = entries
+          .map(([field, error]) => `${field}: ${error}`)
+          .join(", ");
+
+        showMessage("error", message);
+        return;
+      }
+
+      console.error(result);
+
+      showMessage("error", "An unexpected error occurred");
+      return;
+    }
+
+    const data = await response.json();
+    setTokenAndRole(data.token, "loggedPatient");
+    window.location.href = '/pages/loggedPatientDashboard.html';
+  } catch (error) {
+    console.error("Error occurred: " + error);
+    showMessage("error", error?.message || "Network error");
   }
 }
