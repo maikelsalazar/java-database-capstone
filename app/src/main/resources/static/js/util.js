@@ -15,6 +15,21 @@ function setToken(token) {
     return localStorage.setItem("token", token);
 }
 
-function getToken(token) {
+function getToken() {
     return localStorage.getItem("token");
+}
+
+function setTokenAndRole(token, role) {
+    localStorage.setItem("token", token);
+    localStorage.setItem("userRole", role);
+    selectRole(role); // from ./js/render.js
+}
+
+export {
+ setRole,
+ getRole,
+ clearRole,
+ setToken,
+ getToken,
+ setTokenAndRole
 }

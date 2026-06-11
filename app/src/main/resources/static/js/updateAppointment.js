@@ -1,10 +1,14 @@
 // updateAppointment.js
 import { updateAppointment } from "../js/services/appointmentRecordService.js";
 import { getDoctors } from "../js/services/doctorServices.js";
+import { getToken } from './util.js';
+
 document.addEventListener("DOMContentLoaded", initializePage);
 
 async function initializePage() {
-  const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
+  renderContent();
+
+  const token = getToken();
   // Get appointmentId and patientId from the URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
   const appointmentId = urlParams.get("appointmentId");

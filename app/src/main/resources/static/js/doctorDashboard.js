@@ -1,11 +1,12 @@
 import { getAllAppointments } from './services/appointmentRecordService.js';
 import { createPatientRow } from './components/patientRows.js';
+import { getToken } from './util.js';
 
 const tableBody = document.getElementById("patientTableBody");
 const searchBar = document.getElementById("searchBar");
 const datePicker = document.getElementById("datePicker");
 const todayButton = document.getElementById("todayButton");
-const token = localStorage.getItem("token");
+const token = getToken();
 
 let selectedDate = new Date().toISOString().split('T')[0];
 let patientName = null;
@@ -64,7 +65,6 @@ async function loadAppointments() {
                 patient,
                 appointment.appointmentId,
                 appointment.doctorId);
-
 
             tableBody.appendChild(row);
         });

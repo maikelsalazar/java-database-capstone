@@ -6,6 +6,7 @@ import { filterDoctors } from './services/doctorServices.js';
 import { debounce } from './utils/debounce.js';
 
 document.addEventListener("DOMContentLoaded", () => {
+  renderContent();
   adminLoadDoctorCards();
 
   const btnAddDoctor = document.getElementById("addDocBtn");

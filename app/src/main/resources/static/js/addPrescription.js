@@ -1,4 +1,5 @@
 import { savePrescription, getPrescription } from "./services/prescriptionServices.js";
+import { getToken } from './util.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const savePrescriptionBtn = document.getElementById("savePrescription");
@@ -8,11 +9,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const notesInput = document.getElementById("notes");
   const heading = document.getElementById("heading")
 
-
   const urlParams = new URLSearchParams(window.location.search);
   const appointmentId = urlParams.get("appointmentId");
   const mode = urlParams.get("mode");
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const patientName = urlParams.get("patientName")
 
   if (heading) {

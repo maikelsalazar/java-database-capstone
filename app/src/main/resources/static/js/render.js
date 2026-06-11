@@ -18,7 +18,6 @@ function selectRole(role) {
   }
 }
 
-
 function renderContent() {
   const role = localStorage.getItem("userRole");
   if (!role) {

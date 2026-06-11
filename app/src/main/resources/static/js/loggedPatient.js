@@ -5,8 +5,8 @@ import { filterDoctors } from './services/doctorServices.js';
 import { bookAppointment } from './services/appointmentRecordService.js';
 import { debounce } from './utils/debounce.js';
 
-
 document.addEventListener("DOMContentLoaded", () => {
+  renderContent();
   loadDoctorCards();
 });
 
