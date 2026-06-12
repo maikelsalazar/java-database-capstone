@@ -2,30 +2,36 @@ import { API_BASE_URL } from "../config/config.js"
 
 const DOCTOR_API = `${API_BASE_URL}/doctors`
 
-export async function filterDoctors(name, time, specialty) {
-    try {
-        const response = await fetch(`${DOCTOR_API}/filter/${name}/${time}/${specialty}`);
+async function fetchDoctors(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    console.log("Error fetching doctors");
+    throw new Error("Failed to load doctors")
+  }
 
-        const data = await response.json();
+  const data = await response.json();
 
-        return data.doctors || [];
-    } catch(error) {
-        console.log("Error fetching doctors", error)
-        return [];
-    }
+  return data.doctors || [];
 }
 
-export async function getDoctors() {
-    try {
-        const response = await fetch(`${DOCTOR_API}/list`);
+export function filterDoctors(name, time, specialty) {
+  const filterName = name.length > 0 ? name : "*";
+  const filterTime = time.length > 0 ? time : "*";
+  const filterSpecialty = specialty.length > 0 ? specialty : "*";
 
-        const data = await response.json();
+  if (filterName === "*" && filterTime === "*" && filterSpecialty === "*") {
+    return getDoctors();
+  }
 
-        return data.doctors || [];
-    } catch(error) {
-        console.log("Error fetching doctors", error)
-        return [];
-    }
+  const filterDoctorsUrl = `${DOCTOR_API}/filter/${filterName}/${filterTime}/${filterSpecialty}`;
+
+  return fetchDoctors(filterDoctorsUrl);
+}
+
+export function getDoctors() {
+  const fetchAllDoctorsUrl = `${DOCTOR_API}/list`;
+
+  return fetchDoctors(fetchAllDoctorsUrl);
 };
 
 export async function saveDoctor(name, specialty, email, password, phone, availableTimes) {
