@@ -14,7 +14,7 @@ public class PatientCreateDTO {
     private String email;
 
     @NotBlank(message = "Password cannot be null or blank")
-    @Size(min = 3, max = 100)
+    @Size(min = 8, max = 15)
     private String password;
 
     @NotBlank(message = "Phone number cannot be null or blank")

@@ -5,6 +5,7 @@ const PATIENT_API = API_BASE_URL + '/patient';
 
 //For creating a patient in db
 export async function patientSignup(data) {
+  console.log("patientSignUp", data);
   try {
     const response = await fetch(`${PATIENT_API}`,
       {
@@ -15,15 +16,45 @@ export async function patientSignup(data) {
         body: JSON.stringify(data)
       }
     );
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message);
+
+    const payload = await response.json();
+
+    if (response.ok) {
+        return {
+          success: true,
+          message: payload.message,
+          errors: {}
+        };
     }
-    return { success: response.ok, message: result.message }
-  }
-  catch (error) {
-    console.error("Error :: patientSignup :: ", error)
-    return { success: false, message: error.message }
+
+    if (response.status === 400) {
+      return {
+        success: false,
+        message: null,
+        errors: payload.errors || []
+      }
+    } else if (response.status == 409) {
+      return {
+        success: false,
+        message: payload.message,
+        errors: {}
+      }
+    } else {
+      console.log("Unexpected error", "status: " + response.status, payload);
+      return {
+          success: false,
+          message: "Unexpected error",
+          errors: {}
+        }
+    }
+  } catch(error) {
+      return {
+        success: false,
+        message: error instanceof TypeError
+          ? "Cannot connect to server"
+          : "Unexpected internal error",
+        errors: {}
+      }
   }
 }
 

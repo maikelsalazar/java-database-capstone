@@ -65,11 +65,17 @@ export function openModal(type) {
   else if (type === "patientSignup") {
     modalContent = `
       <h2>Patient Signup</h2>
+      <span id="globalErrorMessage" class="error"></span>
       <input type="text" id="name" placeholder="Name" class="input-field">
+      <span id="nameMessage" class="error"></span>
       <input type="email" id="email" placeholder="Email" class="input-field">
+      <span id="emailMessage" class="error"></span>
       <input type="password" id="password" placeholder="Password" class="input-field">
+      <span id="passwordMessage" class="error"></span>
       <input type="text" id="phone" placeholder="Phone" class="input-field">
+      <span id="phoneMessage" class="error"></span>
       <input type="text" id="address" placeholder="Address" class="input-field">
+      <span id="addressMessage" class="error"></span>
       <button class="dashboard-btn" id="signupBtn">Signup</button>
     `;
 

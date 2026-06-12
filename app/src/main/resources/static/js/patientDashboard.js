@@ -85,25 +85,41 @@ function filterDoctorsOnChange() {
 }
 
 window.signupPatient = async function () {
-  try {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const phone = document.getElementById("phone").value;
-    const address = document.getElementById("address").value;
+  // clean error messages
+  document.querySelectorAll("[id$='Message']").forEach(elem => {
+      elem.textContent = "";
+  });
 
-    const data = { name, email, password, phone, address };
-    const { success, message } = await patientSignup(data);
-    if (success) {
-      alert(message);
-      document.getElementById("modal").style.display = "none";
-      window.location.reload();
-    }
-    else alert(message);
-  } catch (error) {
-    console.error("Signup failed:", error);
-    alert("❌ An error occurred while signing up.");
+  // processing form
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const phone = document.getElementById("phone").value;
+  const address = document.getElementById("address").value;
+
+  const data = { name, email, password, phone, address };
+  const response = await patientSignup(data);
+
+  if (response.success) {
+    document.getElementById('modal-body').innerHTML =
+                "<p class='success'>" + response.message + "</p>";
+
+    setTimeout(() => {
+        document.getElementById("modal").style.display = "none";
+    }, 3000);
+
+    return;
   }
+
+  if (response.message) {
+    document.getElementById("globalErrorMessage").textContent = response.message;
+    return;
+  }
+
+  Object.entries(response.errors || {}).forEach(([field, message]) => {
+    const messageElem = document.getElementById(field + "Message");
+    if (messageElem) messageElem.textContent = field + ": " + message;
+  });
 };
 
 function showMessage(type, message) {
