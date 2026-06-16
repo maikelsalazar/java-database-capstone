@@ -178,7 +178,7 @@ public class DoctorControllerIntegrationTest {
                     "name": "John Doe",
                     "specialty": "Pediatrician",
                     "email": "john.doe@email.com",
-                    "password": "123456",
+                    "password": "12345678",
                     "phone": "5554443333",
                     "availableTimes": [
                         "09:00-10:00",
@@ -212,7 +212,7 @@ public class DoctorControllerIntegrationTest {
                     "name": "John Doe",
                     "specialty": "Pediatrician",
                     "email": "john.doe@email.com",
-                    "password": "123456",
+                    "password": "12345678",
                     "phone": "5554443333",
                     "availableTimes": [
                         "09:00-10:00",
