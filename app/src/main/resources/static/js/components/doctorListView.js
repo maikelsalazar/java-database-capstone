@@ -9,7 +9,6 @@ const doctorView = {
   filterBySpecialty: null,
 };
 
-
 function initDoctorListView({
   container,
   filterByName,
@@ -64,6 +63,14 @@ async function renderDoctorCards(promise, type) {
   }
 }
 
+function resetFilterForm() {
+  const { filterByName, filterTime, filterSpecialty } = doctorView;
+
+  if(filterByName) filterByName.value = "";
+  if(filterTime) filterTime.value = "";
+  if(filterSpecialty) filterSpecialty.value = "";
+}
+
 function loadDoctorCards() {
   return renderDoctorCards(
     getDoctors(),
@@ -84,5 +91,6 @@ function filterDoctorsOnChange() {
 
 export {
   initDoctorListView,
-  loadDoctorCards
+  loadDoctorCards,
+  resetFilterForm
 }

@@ -1,9 +1,10 @@
 // adminDashboard.js
 import { openModal } from './components/modals.js';
-import { initDoctorListView, loadDoctorCards } from './components/doctorListView.js';
+import { initDoctorListView, loadDoctorCards, resetFilterForm } from './components/doctorListView.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   renderContent();
+
   initDoctorListView({
     container: document.getElementById("content"),
     filterByName: document.getElementById("searchBar"),

@@ -21,7 +21,7 @@ public class DoctorCreateDTO {
     private String email;
 
     @NotNull(message = "Doctor's password is required")
-    @Size(min = 6, max = 15)
+    @Size(min = 8, max = 15)
     private String password;
 
     @NotNull

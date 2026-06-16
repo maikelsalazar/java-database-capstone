@@ -1,4 +1,4 @@
-import { adminDeleteDoctor } from "./adminDashboard.js";
+import { deleteDoctorHandler } from "./doctorActions.js";
 import { showBookingOverlay } from "./showBookingOverlay.js";
 import { getPatientData } from "../services/patientServices.js";
 
@@ -57,7 +57,7 @@ export function createDoctorCard(doctor) {
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "Delete";
             deleteButton.dataset.id = doctor.id;
-            deleteButton.addEventListener("click", adminDeleteDoctor);
+            deleteButton.addEventListener("click", deleteDoctorHandler);
 
             action.classList.add("card-actions");
             action.appendChild(deleteButton);

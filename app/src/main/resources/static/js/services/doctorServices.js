@@ -3,15 +3,20 @@ import { API_BASE_URL } from "../config/config.js"
 const DOCTOR_API = `${API_BASE_URL}/doctors`
 
 async function fetchDoctors(url) {
+  try {
   const response = await fetch(url);
+
   if (!response.ok) {
-    console.log("Error fetching doctors");
     throw new Error("Failed to load doctors")
   }
 
   const data = await response.json();
 
   return data.doctors || [];
+  } catch(error) {
+    console.log(error);
+    throw error;
+  }
 }
 
 export function filterDoctors(name, time, specialty) {
@@ -38,7 +43,6 @@ export async function saveDoctor(name, specialty, email, password, phone, availa
     const token = localStorage.getItem("token");
 
     const doctor = { name, specialty, email, password, phone, availableTimes };
-    const globalErrorMessage = document.getElementById("globalErrorMessage");
 
     try {
         const response = await fetch(`${DOCTOR_API}/${token}`, {
@@ -52,32 +56,36 @@ export async function saveDoctor(name, specialty, email, password, phone, availa
         if (!response.ok) {
             switch(response.status) {
                 case 400:
-                    const { success, errors } = await response.json();
+                    const { errors } = await response.json();
 
-                    Object.entries(errors).forEach(([field, message]) => {
-                      const fieldMessage = document.getElementById(field + "Message");
-                      fieldMessage.textContent = message;
-                    });
-                break;
+                    return {
+                      success: false,
+                      message: "Validation fails",
+                      errors: errors,
+                    };
+
                 case 401:
-                    globalErrorMessage.textContent = "Forbidden";
-                break;
+                    throw new Error("Forbidden");
+
                 default:
-                    globalErrorMessage.textContent = "Unknown error";
-                break;
+                    throw new Error("Unknown Error");
             }
-            return false;
         }
 
-        return true;
+        return {
+          success: true,
+          message: "",
+          errors: {}
+        };
     } catch(error) {
-        if (error instanceof TypeError) {
-          globalErrorMessage.textContent = "Cannot connect to server";
-        } else {
-          globalErrorMessage.textContent = "Unexpected internal error";
-       }
-
-       return false;
+       return {
+        success: false,
+        message:
+          error instanceof TypeError
+          ? "Cannot connect to server"
+          : error.message,
+        errors: {}
+       };
     }
 };
 
@@ -85,22 +93,35 @@ export async function deleteDoctor(id) {
     const token = localStorage.getItem("token");
 
     try {
-            const response = await fetch(`${DOCTOR_API}/${id}/${token}`, {
-              method: "DELETE",
-              headers: {
-               "Content-Type": "application/json"
-              }
-            });
+      const response = await fetch(`${DOCTOR_API}/${id}/${token}`, {
+        method: "DELETE",
+        headers: {
+         "Content-Type": "application/json"
+        }
+      });
 
-            if (response.ok) return true;
+      if (response.ok) {
+        return {
+          success: true,
+          message: "Doctor deleted successfully",
+          errors: {}
+        };
+      }
 
-            const { success, message } = await response.json();
+      const { message } = await response.json();
 
-            console.log(message);
+      throw new Error(message);
 
-            return false;
     } catch(error) {
-        console.error(error);
-        return false;
+      console.error(error);
+
+      return {
+        success: false,
+        message:
+          error instanceof TypeError
+          ? "Cannot connect to server"
+          : error.message,
+          errors: {}
+      };
     }
 };

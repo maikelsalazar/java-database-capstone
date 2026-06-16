@@ -1,6 +1,6 @@
 // modals.js
 
-import { adminAddDoctor } from '../components/adminDashboard.js';
+import { addDoctorHandler } from './doctorActions.js';
 import { adminLoginHandler, doctorLoginHandler } from '../services/index.js';
 
 export function openModal(type) {
@@ -113,7 +113,7 @@ export function openModal(type) {
   }
 
   if (type === 'addDoctor') {
-    document.getElementById('saveDoctorBtn').addEventListener('click', adminAddDoctor);
+    document.getElementById('saveDoctorBtn').addEventListener('click', addDoctorHandler);
   }
 
   if (type === 'adminLogin') {
