@@ -1,26 +1,17 @@
-import { getDoctors } from './services/doctorServices.js';
 import { openModal } from './components/modals.js';
-import { createDoctorCardList } from './components/doctorCardList.js';
-import { filterDoctors } from './services/doctorServices.js';
+import { initDoctorListView, loadDoctorCards } from './components/doctorListView.js';
 import { patientSignup, patientLogin } from './services/patientServices.js';
-import { debounce } from './utils/debounce.js';
 import { setTokenAndRole } from './util.js';
 
-// Filter Input
-const debouncedFilter = debounce(filterDoctorsOnChange, 500);
-
-const searchBarInput = document.getElementById("searchBar");
-const filterTimeSelect = document.getElementById("filterTime");
-const filterSpecialtySelect = document.getElementById("filterSpecialty");
-
-searchBarInput.addEventListener("input", debouncedFilter);
-filterTimeSelect.addEventListener("change", filterDoctorsOnChange);
-filterSpecialtySelect.addEventListener("change", filterDoctorsOnChange);
-
-// doctor's card container
-const doctorCardListContainer = document.getElementById("content");
 
 document.addEventListener("DOMContentLoaded", () => {
+  initDoctorListView({
+    container: document.getElementById("content"),
+    filterByName: document.getElementById("searchBar"),
+    filterTime: document.getElementById("filterTime"),
+    filterSpecialty: document.getElementById("filterSpecialty")
+  });
+
   loadDoctorCards();
 
   const signupBtn = document.getElementById("patientSignup");
@@ -34,55 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loginBtn.addEventListener("click", () => openModal("patientLogin"));
   }
 });
-
-async function renderDoctorCards(promise, type) {
-  const message = document.createElement("p");
-  const isAll = type === "all";
-
-  message.textContent = isAll
-      ? "Loading..."
-      : "Searching...";
-  doctorCardListContainer.replaceChildren(message);
-
-  try {
-    const doctors = await promise;
-
-    doctorCardListContainer.replaceChildren(
-      createDoctorCardList(doctors, type)
-    );
-  } catch(error) {
-    console.error(isAll
-      ? "Failed to load doctors:"
-      : "Failed to filter doctors:",
-      error
-    );
-
-    const errorMessage = document.createElement("p");
-    errorMessage.textContent = isAll
-      ? "Unable to load doctors."
-      : "Unable to search doctors.";
-
-    doctorCardListContainer.replaceChildren(errorMessage);
-  }
-}
-
-function loadDoctorCards() {
-  return renderDoctorCards(
-    getDoctors(),
-    "all"
-  );
-}
-
-function filterDoctorsOnChange() {
-  const name = searchBarInput.value.trim();
-  const time = filterTimeSelect.value;
-  const specialty = filterSpecialtySelect.value;
-
-  return renderDoctorCards(
-    filterDoctors(name, time, specialty),
-    "filter"
-  );
-}
 
 window.signupPatient = async function () {
   // clean error messages
