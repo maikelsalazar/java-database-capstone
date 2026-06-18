@@ -118,11 +118,11 @@ public class Service {
     }
 
     public String validatePatient(PatientLoginDTO patientLoginDTO) {
-        Patient patient = patientRepository.findByEmail(patientLoginDTO.getEmail());
+        Patient patient = patientRepository.findByEmail(patientLoginDTO.email());
         if (patient == null) return null;
 
         boolean valid = passwordEncoder.matches(
-                patientLoginDTO.getPassword(),
+                patientLoginDTO.password(),
                 patient.getPassword()
         );
 
