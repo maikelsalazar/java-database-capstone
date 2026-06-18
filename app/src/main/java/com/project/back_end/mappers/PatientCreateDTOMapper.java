@@ -8,11 +8,11 @@ public class PatientCreateDTOMapper {
 
     public static Patient toEntity(PatientCreateDTO dto, PasswordEncoder passwordEncoder) {
         Patient patient = new Patient();
-        patient.setName(dto.getName());
-        patient.setEmail(dto.getEmail());
-        patient.setPassword(passwordEncoder.encode(dto.getPassword()));
-        patient.setPhone(dto.getPhone());
-        patient.setAddress(dto.getAddress());
+        patient.setName(dto.name());
+        patient.setEmail(dto.email());
+        patient.setPassword(passwordEncoder.encode(dto.password()));
+        patient.setPhone(dto.phone());
+        patient.setAddress(dto.address());
 
         return patient;
     }
