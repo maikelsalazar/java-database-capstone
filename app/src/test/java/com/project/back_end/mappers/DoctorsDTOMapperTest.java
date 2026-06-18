@@ -31,7 +31,7 @@ public class DoctorsDTOMapperTest {
         DoctorsDTO expectedDTO = new DoctorsDTO(List.of(expectedDoctorDTO));
         DoctorsDTO actualDTO = DoctorsDTOMapper.fromDoctorList(doctorList, "AM");
 
-        assertEquals(expectedDTO.getDoctors().get(0).getAvailableTimes(), actualDTO.getDoctors().get(0).getAvailableTimes());
+        assertEquals(expectedDTO.doctors().get(0).getAvailableTimes(), actualDTO.doctors().get(0).getAvailableTimes());
 
     }
 

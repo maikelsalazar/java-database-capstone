@@ -47,7 +47,7 @@ public class DoctorServiceTest {
 
         DoctorsDTO result = doctorService.getDoctors();
 
-        assertEquals(1, result.getDoctors().size());
+        assertEquals(1, result.doctors().size());
         verify(doctorRepository).findAll();
     }
 
@@ -57,8 +57,8 @@ public class DoctorServiceTest {
 
         DoctorsDTO result = doctorService.findDoctorByName(NAME);
 
-        assertEquals(1, result.getDoctors().size());
-        assertEquals(FULL_NAME, result.getDoctors().get(0).getName());
+        assertEquals(1, result.doctors().size());
+        assertEquals(FULL_NAME, result.doctors().get(0).getName());
 
         verify(doctorRepository).findByName(NAME);
     }
@@ -69,7 +69,7 @@ public class DoctorServiceTest {
 
         DoctorsDTO result = doctorService.findDoctorBySpecialty(SPECIALTY);
 
-        assertEquals(1, result.getDoctors().size());
+        assertEquals(1, result.doctors().size());
 
         verify(doctorRepository).findBySpecialty(SPECIALTY);
     }
@@ -82,9 +82,9 @@ public class DoctorServiceTest {
         DoctorsDTO amResult = doctorService.findDoctorByTime(AM);
         DoctorsDTO pmResult = doctorService.findDoctorByTime(PM);
 
-        assertEquals(1, amResult.getDoctors().size());
-        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), amResult.getDoctors().get(0).getAvailableTimes());
-        assertEquals(List.of(AvailableTime.SLOT_13_14), pmResult.getDoctors().get(0).getAvailableTimes());
+        assertEquals(1, amResult.doctors().size());
+        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), amResult.doctors().get(0).getAvailableTimes());
+        assertEquals(List.of(AvailableTime.SLOT_13_14), pmResult.doctors().get(0).getAvailableTimes());
 
         verify(doctorRepository).findByTime(AM);
         verify(doctorRepository).findByTime(PM);
@@ -99,9 +99,9 @@ public class DoctorServiceTest {
 
         DoctorsDTO result = doctorService.filterDoctorByNameAndTime(NAME, AM);
 
-        assertEquals(1, result.getDoctors().size());
-        assertEquals(FULL_NAME, result.getDoctors().get(0).getName());
-        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.getDoctors().get(0).getAvailableTimes());
+        assertEquals(1, result.doctors().size());
+        assertEquals(FULL_NAME, result.doctors().get(0).getName());
+        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.doctors().get(0).getAvailableTimes());
 
         verify(doctorRepository).findByNameAndTime(NAME, AM);
     }
@@ -114,9 +114,9 @@ public class DoctorServiceTest {
         DoctorsDTO result =
                 doctorService.filterDoctorByNameAndSpecialty(NAME, SPECIALTY);
 
-        assertEquals(1, result.getDoctors().size());
-        assertEquals(FULL_NAME, result.getDoctors().get(0).getName());
-        assertEquals(SPECIALTY, result.getDoctors().get(0).getSpecialty());
+        assertEquals(1, result.doctors().size());
+        assertEquals(FULL_NAME, result.doctors().get(0).getName());
+        assertEquals(SPECIALTY, result.doctors().get(0).getSpecialty());
 
         verify(doctorRepository).findByNameAndSpecialty(NAME, SPECIALTY);
     }
@@ -129,9 +129,9 @@ public class DoctorServiceTest {
         DoctorsDTO result =
                 doctorService.filterDoctorByTimeAndSpecialty(AM, SPECIALTY);
 
-        assertEquals(1, result.getDoctors().size());
-        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.getDoctors().get(0).getAvailableTimes());
-        assertEquals(SPECIALTY, result.getDoctors().get(0).getSpecialty());
+        assertEquals(1, result.doctors().size());
+        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.doctors().get(0).getAvailableTimes());
+        assertEquals(SPECIALTY, result.doctors().get(0).getSpecialty());
 
         verify(doctorRepository).findByTimeAndSpecialty(AM, SPECIALTY);
     }
@@ -144,9 +144,9 @@ public class DoctorServiceTest {
         DoctorsDTO result =
                 doctorService.filterDoctorByTimeAndSpecialty(PM, SPECIALTY);
 
-        assertEquals(1, result.getDoctors().size());
-        assertEquals(List.of(AvailableTime.SLOT_13_14), result.getDoctors().get(0).getAvailableTimes());
-        assertEquals(SPECIALTY, result.getDoctors().get(0).getSpecialty());
+        assertEquals(1, result.doctors().size());
+        assertEquals(List.of(AvailableTime.SLOT_13_14), result.doctors().get(0).getAvailableTimes());
+        assertEquals(SPECIALTY, result.doctors().get(0).getSpecialty());
 
         verify(doctorRepository).findByTimeAndSpecialty(PM, SPECIALTY);
     }
@@ -159,10 +159,10 @@ public class DoctorServiceTest {
         DoctorsDTO result =
                 doctorService.filterDoctorsByNameAndSpecialtyAndTime(NAME, PM, SPECIALTY);
 
-        assertEquals(1, result.getDoctors().size());
-        assertEquals(FULL_NAME, result.getDoctors().get(0).getName());
-        assertEquals(SPECIALTY, result.getDoctors().get(0).getSpecialty());
-        assertEquals(List.of(AvailableTime.SLOT_13_14), result.getDoctors().get(0).getAvailableTimes());
+        assertEquals(1, result.doctors().size());
+        assertEquals(FULL_NAME, result.doctors().get(0).getName());
+        assertEquals(SPECIALTY, result.doctors().get(0).getSpecialty());
+        assertEquals(List.of(AvailableTime.SLOT_13_14), result.doctors().get(0).getAvailableTimes());
 
         verify(doctorRepository).findByNameAndTimeAndSpecialty(NAME, PM, SPECIALTY);
     }
@@ -177,7 +177,7 @@ public class DoctorServiceTest {
         DoctorsDTO result =
                 doctorService.findDoctorByName("John");
 
-        assertEquals(0, result.getDoctors().size());
+        assertEquals(0, result.doctors().size());
 
         verify(doctorRepository).findByName("John");
     }
@@ -189,7 +189,7 @@ public class DoctorServiceTest {
 
         DoctorsDTO result = doctorService.findDoctorByName("Foo");
 
-        assertEquals(0, result.getDoctors().size());
+        assertEquals(0, result.doctors().size());
 
         verify(doctorRepository).findByName("Foo");
     }
@@ -200,7 +200,7 @@ public class DoctorServiceTest {
 
         DoctorsDTO result = doctorService.findDoctorByTime("INVALID");
 
-        assertEquals(0, result.getDoctors().size());
+        assertEquals(0, result.doctors().size());
     }
 
 

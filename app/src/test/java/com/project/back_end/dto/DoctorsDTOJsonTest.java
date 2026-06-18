@@ -50,12 +50,12 @@ class DoctorsDTOJsonTest {
 
         DoctorsDTO result = json.parseObject(expected);
 
-        assertThat(result.getDoctors()).hasSize(1);
-        assertThat(result.getDoctors().get(0).getId()).isEqualTo(1);
-        assertThat(result.getDoctors().get(0).getName()).isEqualTo("Jane Doe");
-        assertThat(result.getDoctors().get(0).getSpecialty()).isEqualTo("Cardiologist");
-        assertThat(result.getDoctors().get(0).getEmail()).isEqualTo("jane.doe@email.com");
-        assertThat(result.getDoctors().get(0).getPhone()).isEqualTo("555-101-2020");
-        assertThat(result.getDoctors().get(0).getAvailableTimes().get(0).getValue()).isEqualTo(AvailableTime.SLOT_09_10.getValue());
+        assertThat(result.doctors()).hasSize(1);
+        assertThat(result.doctors().get(0).getId()).isEqualTo(1);
+        assertThat(result.doctors().get(0).getName()).isEqualTo("Jane Doe");
+        assertThat(result.doctors().get(0).getSpecialty()).isEqualTo("Cardiologist");
+        assertThat(result.doctors().get(0).getEmail()).isEqualTo("jane.doe@email.com");
+        assertThat(result.doctors().get(0).getPhone()).isEqualTo("555-101-2020");
+        assertThat(result.doctors().get(0).getAvailableTimes().get(0).getValue()).isEqualTo(AvailableTime.SLOT_09_10.getValue());
     }
 }
