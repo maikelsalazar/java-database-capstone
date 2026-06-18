@@ -101,12 +101,12 @@ public class Service {
     }
 
     public String validateDoctor(DoctorLoginDTO doctorLogin) {
-        Doctor doctor = doctorRepository.findByEmail(doctorLogin.getEmail());
+        Doctor doctor = doctorRepository.findByEmail(doctorLogin.email());
 
         if (doctor == null) return null;
 
         boolean valid = passwordEncoder.matches(
-                doctorLogin.getPassword(),
+                doctorLogin.password(),
                 doctor.getPassword()
         );
 
