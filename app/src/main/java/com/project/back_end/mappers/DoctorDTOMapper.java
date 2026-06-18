@@ -9,14 +9,14 @@ public class DoctorDTOMapper {
     public static Doctor fromCreate(DoctorCreateDTO dto, PasswordEncoder passwordEncoder) {
         Doctor doctor = new Doctor();
 
-        doctor.setName(dto.getName());
-        doctor.setSpecialty(dto.getSpecialty());
-        doctor.setEmail(dto.getEmail());
+        doctor.setName(dto.name());
+        doctor.setSpecialty(dto.specialty());
+        doctor.setEmail(dto.email());
         doctor.setPassword(
-                passwordEncoder.encode(dto.getPassword())
+                passwordEncoder.encode(dto.password())
         );
-        doctor.setPhone(dto.getPhone());
-        doctor.setAvailableTimes(dto.getAvailableTimes());
+        doctor.setPhone(dto.phone());
+        doctor.setAvailableTimes(dto.availableTimes());
 
         return doctor;
     }

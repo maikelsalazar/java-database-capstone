@@ -30,7 +30,7 @@ public class DoctorService {
 
     @Transactional
     public void saveDoctor(DoctorCreateDTO dto) {
-        if (doctorRepository.existsByEmail(dto.getEmail())) {
+        if (doctorRepository.existsByEmail(dto.email())) {
             throw new DuplicateEmailException();
         }
 
