@@ -84,12 +84,12 @@ public class Service {
     }
 
     public String validateAdmin(AdminLoginDTO adminRequest) {
-        Admin admin = adminRepository.findByUsername(adminRequest.getUsername());
+        Admin admin = adminRepository.findByUsername(adminRequest.username());
 
         if (admin == null) return null;
 
         boolean valid = passwordEncoder.matches(
-                adminRequest.getPassword(),
+                adminRequest.password(),
                 admin.getPassword()
         );
 
