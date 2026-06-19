@@ -48,9 +48,10 @@
     filter: brightness(1.5);
   }
 
-  #patientName{
+  #patientName {
     background-color: #bdbcbc80;
   }
+
   .btn-primary {
     background-color: #047857;
     color: #fff;
