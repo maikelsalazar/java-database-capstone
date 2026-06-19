@@ -1,6 +1,7 @@
 // updateAppointment.js
 import { updateAppointment } from "../js/services/appointmentRecordService.js";
 import { getDoctors } from "../js/services/doctorServices.js";
+import { toAppointmentTimeSlot } from './utils/toAppointmentTimeSlot.js';
 import { getToken } from './util.js';
 
 document.addEventListener("DOMContentLoaded", initializePage);
@@ -19,7 +20,8 @@ async function initializePage() {
   const appointmentDate = urlParams.get("appointmentDate");
   const appointmentTime = urlParams.get("appointmentTime");
 
-  console.log(doctorId)
+  const appointmentTimeSlot = toAppointmentTimeSlot(appointmentTime);
+
   if (!token || !patientId) {
     alert("Missing session data, redirecting to appointments page.");
     window.location.href = "/pages/patientAppointments.html";
@@ -40,7 +42,6 @@ async function initializePage() {
       document.getElementById("patientName").value = patientName || "You";
       document.getElementById("doctorName").value = doctorName;
       document.getElementById("appointmentDate").value = appointmentDate;
-      document.getElementById("appointmentTime").value = appointmentTime;
 
       const timeSelect = document.getElementById("appointmentTime");
       doctor.availableTimes.forEach(time => {
@@ -49,13 +50,14 @@ async function initializePage() {
         option.textContent = time;
         timeSelect.appendChild(option);
       });
+      timeSelect.value = appointmentTimeSlot;
 
       // Handle form submission for updating the appointment
       document.getElementById("updateAppointmentForm").addEventListener("submit", async (e) => {
         e.preventDefault(); // Prevent default form submission
 
         const date = document.getElementById("appointmentDate").value;
-        const time = document.getElementById("appointmentTime").value;
+        const time = timeSelect.value;
         const startTime = time.split('-')[0];
         if (!date || !time) {
           alert("Please select both date and time.");
