@@ -33,13 +33,15 @@ export async function bookAppointment(appointment, token) {
     const data = await response.json();
     return {
       success: response.ok,
-      message: data.message || "Something went wrong"
+      message: data.message || null,
+      errors: data.errors || {}
     };
   } catch (error) {
     console.error("Error while booking appointment:", error);
     return {
       success: false,
-      message: "Network error. Please try again later."
+      message: "Network error. Please try again later.",
+      errors: {}
     };
   }
 }
@@ -57,13 +59,15 @@ export async function updateAppointment(appointment, token) {
     const data = await response.json();
     return {
       success: response.ok,
-      message: data.message || "Something went wrong"
+      message: data.message || "Something went wrong",
+      errors: data.errors || {}
     };
   } catch (error) {
     console.error("Error while booking appointment:", error);
     return {
       success: false,
-      message: "Network error. Please try again later."
+      message: "Network error. Please try again later.",
+      errors: {}
     };
   }
 }

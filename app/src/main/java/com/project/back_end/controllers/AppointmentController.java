@@ -4,6 +4,7 @@ import com.project.back_end.DTO.*;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.AppointmentService;
 import com.project.back_end.services.Service;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class AppointmentController {
     @PostMapping("/{token}")
     public ResponseEntity<ApiResponseDTO> bookAppointment(
             @PathVariable String token,
-            @RequestBody AppointmentCreateDTO appointmentCreate
+            @RequestBody @Valid  AppointmentCreateDTO appointmentCreate
     ) {
 
         String email = getPatientEmailFromToken(token);
@@ -41,7 +42,7 @@ public class AppointmentController {
     @PutMapping("/{token}")
     public ResponseEntity<ApiResponseDTO> updateAppointment(
             @PathVariable String token,
-            @RequestBody AppointmentUpdateDTO appointmentUpdate
+            @RequestBody @Valid AppointmentUpdateDTO appointmentUpdate
     ) {
 
         String email = getPatientEmailFromToken(token);

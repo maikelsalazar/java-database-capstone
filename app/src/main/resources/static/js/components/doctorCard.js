@@ -64,14 +64,14 @@ export function createDoctorCard(doctor) {
         break;
         case 'patient':
             const bookButton = document.createElement("button");
-            bookButton.textContent = "Book An Appointment";
+            bookButton.textContent = "Book Appointment";
 
             action.classList.add("card-actions");
             action.appendChild(bookButton);
         break;
         case 'loggedPatient':
             const bookNowButton = document.createElement("button");
-            bookNowButton.textContent = "Book An Appointment";
+            bookNowButton.textContent = "Book Appointment";
 
             bookNowButton.addEventListener("click", (e) =>
                 handleBookAnAppointment(e, doctor)

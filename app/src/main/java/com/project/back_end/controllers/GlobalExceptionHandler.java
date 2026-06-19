@@ -5,6 +5,7 @@ import com.project.back_end.exceptions.*;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,6 +31,19 @@ public class GlobalExceptionHandler {
                 );
 
         return failure(HttpStatus.BAD_REQUEST, errors);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponseDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        String message = ex.getMessage();
+
+        Throwable cause = ex.getMostSpecificCause();
+
+        if (cause instanceof java.time.format.DateTimeParseException) {
+            message = "Invalid date and time";
+        }
+
+        return failure(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(AppointmentTimeInPastException.class)

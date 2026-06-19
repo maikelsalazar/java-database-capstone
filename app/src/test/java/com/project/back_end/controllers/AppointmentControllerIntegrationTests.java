@@ -431,6 +431,61 @@ public class AppointmentControllerIntegrationTests {
     }
 
     @Test
+    void shouldNotBookAppointmentWhenAppointmentTimeHasWrongFormat() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
+
+        String createAppointmentJson = """
+                {
+                    "doctor":{
+                        "id":%d
+                    },
+                    "patient":
+                        {
+                        "id":%d
+                    },
+                    "appointmentTime":"T:00",
+                    "status":0
+                }
+                """.formatted(doctor.getId(), patient.getId());
+
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isString())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+
+        assertEquals(0, appointmentRepository.count());
+    }
+
+    @Test
+    void shouldNotBookAppointmentOnMissingRequiredFiled() throws Exception {
+        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
+        Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
+
+        String createAppointmentJson = """
+                {
+                }
+                """;
+
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(post(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createAppointmentJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors").isNotEmpty());
+
+        assertEquals(0, appointmentRepository.count());
+    }
+
+    @Test
     void shouldUpdateAppointmentSuccessfully() throws Exception {
         Patient anPatient = PatientBuilder.aPatient().build();
         Doctor anDoctor = DoctorBuilder.aDoctor()
