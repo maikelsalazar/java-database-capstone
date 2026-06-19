@@ -59,7 +59,7 @@ public class PatientService {
 
     @Transactional
     public List<AppointmentDTO> getPatientAppointments(Long patientId) {
-        List<Appointment> appointments = appointmentRepository.findByPatientId(patientId);
+        List<Appointment> appointments = appointmentRepository.findByPatientIdOrderByAppointmentTimeDesc(patientId);
 
         return AppointmentMapper.toDTOList(appointments);
     }
