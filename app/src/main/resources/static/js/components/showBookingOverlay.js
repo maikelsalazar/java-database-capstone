@@ -79,7 +79,6 @@ export function showBookingOverlay(e, doctor, patient) {
       if (entries.length > 0) {
         document.getElementById("globalErrorMessage").textContent = "Validation errors";
         entries.forEach(([field, message]) => {
-
           const fieldMessage = document.getElementById(`${field}Message`);
           if (fieldMessage) {
             console.log(message);

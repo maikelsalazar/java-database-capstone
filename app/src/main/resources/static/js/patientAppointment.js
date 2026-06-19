@@ -42,21 +42,20 @@ function renderAppointments(appointments) {
   }
 
   if (!appointments.length) {
-    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No Appointments Found</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No Appointments Found</td></tr>`;
     return;
   }
 
   appointments.forEach(appointment => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${appointment.patientName || "You"}</td>
       <td>${appointment.doctorName}</td>
       <td>${appointment.appointmentDate}</td>
       <td>${appointment.appointmentTimeOnly}</td>
-      <td>${appointment.status == 0 ? `<img src="../assets/images/edit/edit.png" alt="Edit" class="prescription-btn" data-id="${appointment.patientId}">` : "-"}</td>
+      <td>${appointment.status === 0 ? `<img src="../assets/images/edit/edit.png" alt="Update Appointment" title="Update Appointment" class="prescription-btn" data-id="${appointment.patientId}">` : "-"}</td>
     `;
 
-    if (appointment.status == 0) {
+    if (appointment.status === 0) {
       const actionBtn = tr.querySelector(".prescription-btn");
       actionBtn?.addEventListener("click", () => redirectToUpdatePage(appointment));
     }
@@ -83,7 +82,6 @@ function redirectToUpdatePage(appointment) {
   }, 100);
 }
 
-
 // Search and Filter Listeners
 document.getElementById("searchBar").addEventListener("input", handleFilterChange);
 document.getElementById("appointmentFilter").addEventListener("change", handleFilterChange);
@@ -106,4 +104,3 @@ async function handleFilterChange() {
     alert("❌ An error occurred while filtering appointments.");
   }
 }
-
