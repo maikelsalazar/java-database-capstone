@@ -58,10 +58,8 @@ Each repository interfaces interact directly with the underlying database engine
 
 ### 6. Model Binding:
 Once data is retrieved from the database is mapped into Java Model Classes. In case of Structured-relational data (MySQL) is mapped into JPA Entities (annotated as @Entity), and for Document-based data (MongoDB) is loaded into document objects (typically annotated @Document), which map to BSON or JSON structures and collections.
-Once data is retrieved from the database is mapped into Java Model Classes. In case of Structured-relational data (MySQL) is mapped into JPA Entities (annotated as @Entity), and for Document-based data (MongoDB) is loaded into document objects (typically annotated @Document), which map to BSON or JSON structures and collections.
 
 ### 7. Application model
-The bound models are used in the response layer, that are passed from the controller to thymeleaf templates for the MVC flows where they are rendered as dynamic HTML for the browser. In REST flows the same model (or DTOs) are serialized into JSON and sent back to the client.
 The bound models are used in the response layer, that are passed from the controller to thymeleaf templates for the MVC flows where they are rendered as dynamic HTML for the browser. In REST flows the same model (or DTOs) are serialized into JSON and sent back to the client.
 
 ## Reference:
