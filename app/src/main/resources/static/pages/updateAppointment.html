@@ -21,17 +21,23 @@
             <div class="main-content">
                 <div class="form-container">
                     <h2>Update <span>Appointment</span></h2>
+                    <span id="globalErrorMessage" class="error"></span>
                     <form id="updateAppointmentForm">
                         <label for="patientName">Patient Name</label>
+                        <span id="patientMessage" class="error"></span>
                         <input type="text" id="patientName" disabled>
 
                         <label for="doctorName">Doctor Name</label>
+                        <span id="doctorMessage" class="error"></span>
                         <input type="text" id="doctorName" disabled>
 
+                        <span id="appointmentTimeMessage" class="error"></span>
                         <label for="appointmentDate">Date</label>
+                        <span id="dateMessage" class="error"></span>
                         <input type="date" id="appointmentDate" required>
 
                         <label for="appointmentTime">Time</label>
+                        <span id="timeMessage" class="error"></span>
                         <select id="appointmentTime" required>
                         </select>
 

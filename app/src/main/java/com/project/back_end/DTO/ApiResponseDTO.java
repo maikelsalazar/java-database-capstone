@@ -19,7 +19,7 @@ public record ApiResponseDTO (
         return new ApiResponseDTO(false, message, null);
     }
 
-    public static ApiResponseDTO failure(Map<String, String> errors){
-        return new ApiResponseDTO(false, null, errors);
+    public static ApiResponseDTO failure(String message, Map<String, String> errors){
+        return new ApiResponseDTO(false, message, errors);
     }
 }

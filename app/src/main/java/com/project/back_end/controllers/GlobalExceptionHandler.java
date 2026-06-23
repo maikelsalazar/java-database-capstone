@@ -1,16 +1,19 @@
 package com.project.back_end.controllers;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.project.back_end.DTO.ApiResponseDTO;
 import com.project.back_end.exceptions.*;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,16 +33,26 @@ public class GlobalExceptionHandler {
                         error -> errors.put(error.getField(), error.getDefaultMessage())
                 );
 
-        return failure(HttpStatus.BAD_REQUEST, errors);
+        return failure(HttpStatus.BAD_REQUEST, "Request validation failed", errors);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponseDTO> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        return failure(
+                HttpStatus.METHOD_NOT_ALLOWED,
+                "Method %s not allowed".formatted(ex.getMethod())
+        );
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponseDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
-        String message = ex.getMessage();
+        String message = "Invalid request body";
 
         Throwable cause = ex.getMostSpecificCause();
-
-        if (cause instanceof java.time.format.DateTimeParseException) {
+        if (cause instanceof JsonParseException) {
+            message = "Invalid JSON";
+        }
+        else if (cause instanceof DateTimeParseException) {
             message = "Invalid date and time";
         }
 
@@ -80,7 +93,7 @@ public class GlobalExceptionHandler {
             UnauthorizedException.class,
             SignatureException.class
     })
-    public ResponseEntity<ApiResponseDTO> handledUnauthorized(Exception ex) {
+    public ResponseEntity<ApiResponseDTO> handleUnauthorized(Exception ex) {
         return failure(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
     }
 
@@ -89,9 +102,9 @@ public class GlobalExceptionHandler {
         return failure(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
     }
 
-    private ResponseEntity<ApiResponseDTO> failure(HttpStatus status, Map<String, String> errors) {
+    private ResponseEntity<ApiResponseDTO> failure(HttpStatus status, String message, Map<String, String> errors) {
         return ResponseEntity.status(status)
-                .body(ApiResponseDTO.failure(errors));
+                .body(ApiResponseDTO.failure(message, errors));
     }
 
     private ResponseEntity<ApiResponseDTO> failure(HttpStatus status, String message) {

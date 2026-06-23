@@ -2,7 +2,6 @@ import { loadDoctorCards, resetFilterForm } from './doctorListView.js';
 import { saveDoctor, deleteDoctor } from '../services/doctorServices.js';
 
 export async function addDoctorHandler() {
-
   document.querySelectorAll("[id$='Message']").forEach(elem => {
     elem.textContent = "";
   });

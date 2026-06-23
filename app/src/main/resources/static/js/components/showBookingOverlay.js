@@ -25,14 +25,14 @@ export function showBookingOverlay(e, doctor, patient) {
     <span id="doctorMessage" class="error"></span>
     <input class="input-field" name="specialty" type="text" value="${doctor.specialty}" disabled/>
     <input class="input-field" name="email" type="email" value="${doctor.email}" disabled/>
-    <span id="appointmentTimeMessage" class"error"></span>
+    <span id="appointmentTimeMessage" class="error"></span>
     <input class="input-field" id="appointment-date" type="date" id="appointment-date" />
-    <span id="dateMessage" class"error"></span>
+    <span id="dateMessage" class="error"></span>
     <select class="input-field" id="appointment-time">
       <option value="">Select time</option>
       ${doctor.availableTimes.map(t => `<option value="${t}">${t}</option>`).join('')}
     </select>
-    <span id="timeMessage" class"error"></span>
+    <span id="timeMessage" class="error"></span>
     <br />
     <button class="confirm-booking">Confirm Booking</button>
   `;

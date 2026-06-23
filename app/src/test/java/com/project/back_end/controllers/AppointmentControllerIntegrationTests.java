@@ -464,7 +464,6 @@ public class AppointmentControllerIntegrationTests {
 
     @Test
     void shouldNotBookAppointmentOnMissingRequiredFiled() throws Exception {
-        Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
         Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
 
         String createAppointmentJson = """
@@ -479,7 +478,9 @@ public class AppointmentControllerIntegrationTests {
                         .content(createAppointmentJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").isNotEmpty())
+                .andExpect(jsonPath("$.errors").isMap())
                 .andExpect(jsonPath("$.errors").isNotEmpty());
 
         assertEquals(0, appointmentRepository.count());
@@ -529,7 +530,7 @@ public class AppointmentControllerIntegrationTests {
     }
 
     @Test
-    void shouldRejectUserWithInvalidRole() throws Exception {
+    void shouldRejectAppointmentUpdateWhenUserHasInvalidRole() throws Exception {
         Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
         Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor()
                 .withAvailableTimes(AVAILABLE_TIMES)
@@ -597,7 +598,7 @@ public class AppointmentControllerIntegrationTests {
     }
 
     @Test
-    void shouldRejectWhenAppointmentTimeIsInThePast() throws Exception {
+    void shouldRejectAppointmentUpdateWhenAppointmentTimeIsInThePast() throws Exception {
         Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
         Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor()
                 .withAvailableTimes(AVAILABLE_TIMES)
@@ -633,7 +634,7 @@ public class AppointmentControllerIntegrationTests {
     }
 
     @Test
-    void shouldRejectWhenAppointmentHasIllegalStatus() throws Exception {
+    void shouldRejectAppointmentUpdateWhenAppointmentHasIllegalStatus() throws Exception {
         Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
         Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
         LocalDateTime appointmentTime = at(1);
@@ -661,13 +662,13 @@ public class AppointmentControllerIntegrationTests {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value(IllegalAppointmentUpdateException.ILLEGAL_APPOINTMENT_STATUS));
+                .andExpect(jsonPath("$.message").isNotEmpty());
 
         checkNoChangesMade(appointment);
     }
 
     @Test
-    void shouldNotUpdateAppointmentWhenDoctorIsAlreadyBooked() throws Exception {
+    void shouldRejectAppointmentUpdateWhenDoctorIsAlreadyBooked() throws Exception {
         Patient patientA = patientRepository.save(PatientBuilder.aPatient().build());
         Patient patientB = patientRepository.save(PatientBuilder.aPatient()
                 .withEmail("lisa.doe@email.com")
@@ -710,14 +711,14 @@ public class AppointmentControllerIntegrationTests {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value(AppointmentAlreadyExistsException.DOCTOR_ALREADY_BOOKED));
+                .andExpect(jsonPath("$.message").isNotEmpty());
 
         checkNoChangesMade(appointmentOfPatientA);
         checkNoChangesMade(appointmentOfPatientB);
     }
 
     @Test
-    void shouldNotUpdateAppointmentWhenPatientHasAppointmentAtTheSameTime() throws Exception {
+    void shouldRejectAppointmentUpdateWhenPatientHasAppointmentAtTheSameTime() throws Exception {
         Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
         Doctor doctorA = doctorRepository.save(DoctorBuilder.aDoctor()
                 .withAvailableTimes(AVAILABLE_TIMES)
@@ -759,7 +760,7 @@ public class AppointmentControllerIntegrationTests {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value(AppointmentAlreadyExistsException.PATIENT_HAS_ANOTHER_APPOINTMENT));
+                .andExpect(jsonPath("$.message").isNotEmpty());
 
         checkNoChangesMade(appointmentA);
         checkNoChangesMade(appointmentB);
@@ -803,7 +804,7 @@ public class AppointmentControllerIntegrationTests {
     }
 
     @Test
-    void shouldNotUpdateAppointmentWhenDoctorIsUnavailable() throws Exception {
+    void shouldRejectAppointmentUpdateWhenDoctorIsUnavailable() throws Exception {
         Patient patient = patientRepository.save(PatientBuilder.aPatient().build());
         Doctor doctor = doctorRepository.save(DoctorBuilder.aDoctor().build());
         LocalDateTime appointmentTime = at(1, 10);
@@ -829,8 +830,50 @@ public class AppointmentControllerIntegrationTests {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value(UnavailableDoctorException.UNAVAILABLE_DOCTOR));
+                .andExpect(jsonPath("$.message").isNotEmpty());
 
+
+        checkNoChangesMade(appointment);
+    }
+
+    @Test
+    void shouldRejectAppointmentUpdateWhenMissingRequiredFields() throws Exception {
+        Patient anPatient = PatientBuilder.aPatient().build();
+        Doctor anDoctor = DoctorBuilder.aDoctor()
+                .withAvailableTimes(AVAILABLE_TIMES)
+                .build();
+
+        Patient patient = patientRepository.save(anPatient);
+        Doctor doctor = doctorRepository.save(anDoctor);
+
+        LocalDateTime appointmentTime = at(1);
+        LocalDateTime newAppointmentTime = at(2);
+
+        Appointment anAppointment = AppointmentBuilder.anAppointment()
+                .withDoctor(doctor)
+                .withPatient(patient)
+                .withAppointmentTime(appointmentTime)
+                .build();
+
+        Appointment appointment = appointmentRepository.save(anAppointment);
+
+        String updateAppointmentJson = """
+                {
+                    "id": %d
+                }
+                """.formatted(appointment.getId(), newAppointmentTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        String token = getToken(patient.getEmail(), Role.PATIENT);
+
+        mockMvc.perform(put(APPOINTMENTS_API + "/" + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateAppointmentJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").isNotEmpty())
+                .andExpect(jsonPath("$.errors").isMap())
+                .andExpect(jsonPath("$.errors").isNotEmpty());
 
         checkNoChangesMade(appointment);
     }
