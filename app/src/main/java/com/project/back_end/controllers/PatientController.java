@@ -26,16 +26,12 @@ public class PatientController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createPatient(@Valid @RequestBody PatientCreateDTO newPatient) {
+    public ResponseEntity<ApiResponseDTO> createPatient(@Valid @RequestBody PatientCreateDTO newPatient) {
         patientService.createPatient(newPatient);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Patient created successfully");
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(ApiResponseDTO.success("Patient created successfully"));
     }
 
     @PostMapping("/login")
