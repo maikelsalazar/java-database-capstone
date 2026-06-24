@@ -1,9 +1,6 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.DTO.DoctorCreateDTO;
-import com.project.back_end.DTO.DoctorsDTO;
-import com.project.back_end.DTO.EmailLoginDTO;
-import com.project.back_end.DTO.LoginResponseDTO;
+import com.project.back_end.DTO.*;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
@@ -11,9 +8,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("${api.path}doctor")
@@ -59,20 +53,17 @@ public class DoctorController {
     }
 
     @PostMapping("/{token}")
-    public ResponseEntity<Map<String, Object>> saveDoctor(@PathVariable String token, @Valid @RequestBody DoctorCreateDTO newDoctorRequest) {
+    public ResponseEntity<ApiResponseDTO> saveDoctor(@PathVariable String token, @Valid @RequestBody DoctorCreateDTO newDoctorRequest) {
 
         service.validateTokenOrThrow(token, Role.ADMIN);
 
         doctorService.saveDoctor(newDoctorRequest);
 
-        Map<String, Object> content = new HashMap<>();
-        content.put("message", "Doctor added successfully");
-
-        return ResponseEntity.ok(content);
+        return ResponseEntity.ok(ApiResponseDTO.success("Doctor added successfully"));
     }
 
     @DeleteMapping("/{id}/{token}")
-    public ResponseEntity<Map<String, Object>> deleteDoctor(
+    public ResponseEntity<Void> deleteDoctor(
             @PathVariable Long id,
             @PathVariable String token
     ) {
