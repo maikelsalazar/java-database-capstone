@@ -39,25 +39,17 @@ public class PatientController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody EmailLoginDTO loginRequest) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody EmailLoginDTO loginRequest) {
         String token = service.validatePatient(loginRequest);
 
-        Map<String, Object> body = new HashMap<>();
         if (token == null) {
-            body.put("success", false);
-            body.put("message", "Invalid credentials");
-
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(body);
+                    .body(LoginResponseDTO.failure());
         }
 
-        body.put("success", true);
-        body.put("message", "Login successful");
-        body.put("token", token);
-
         return ResponseEntity
-                .ok(body);
+                .ok(LoginResponseDTO.success(token));
     }
 
     @GetMapping("/{token}")

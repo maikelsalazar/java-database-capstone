@@ -3,6 +3,7 @@ package com.project.back_end.controllers;
 import com.project.back_end.DTO.DoctorCreateDTO;
 import com.project.back_end.DTO.DoctorsDTO;
 import com.project.back_end.DTO.EmailLoginDTO;
+import com.project.back_end.DTO.LoginResponseDTO;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
@@ -45,24 +46,16 @@ public class DoctorController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> doctorLogin(@Valid @RequestBody EmailLoginDTO loginRequest) {
+    public ResponseEntity<LoginResponseDTO> doctorLogin(@Valid @RequestBody EmailLoginDTO loginRequest) {
         String token = service.validateDoctor(loginRequest);
 
-        Map<String, Object> content = new HashMap<>();
         if (token == null) {
-            content.put("success", false);
-            content.put("message","Invalid credentials");
-
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(content);
+                    .body(LoginResponseDTO.failure());
         }
 
-        content.put("success", true);
-        content.put("message","Login successful");
-        content.put("token", token);
-
-        return ResponseEntity.ok(content);
+        return ResponseEntity.ok(LoginResponseDTO.success(token));
     }
 
     @PostMapping("/{token}")
