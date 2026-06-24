@@ -1,9 +1,6 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.DTO.AppointmentDTO;
-import com.project.back_end.DTO.PatientCreateDTO;
-import com.project.back_end.DTO.PatientDTO;
-import com.project.back_end.DTO.PatientLoginDTO;
+import com.project.back_end.DTO.*;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.PatientService;
 import com.project.back_end.services.Service;
@@ -42,8 +39,8 @@ public class PatientController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody PatientLoginDTO patientLoginDTO) {
-        String token = service.validatePatient(patientLoginDTO);
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody EmailLoginDTO loginRequest) {
+        String token = service.validatePatient(loginRequest);
 
         Map<String, Object> body = new HashMap<>();
         if (token == null) {

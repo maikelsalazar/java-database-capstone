@@ -1,9 +1,6 @@
 package com.project.back_end.services;
 
-import com.project.back_end.DTO.AdminLoginDTO;
-import com.project.back_end.DTO.DoctorLoginDTO;
-import com.project.back_end.DTO.DoctorsDTO;
-import com.project.back_end.DTO.PatientLoginDTO;
+import com.project.back_end.DTO.*;
 import com.project.back_end.exceptions.NotAllowedException;
 import com.project.back_end.models.Admin;
 import com.project.back_end.models.Doctor;
@@ -100,13 +97,13 @@ public class Service {
         return tokenService.generateToken(user);
     }
 
-    public String validateDoctor(DoctorLoginDTO doctorLogin) {
-        Doctor doctor = doctorRepository.findByEmail(doctorLogin.email());
+    public String validateDoctor(EmailLoginDTO loginRequest) {
+        Doctor doctor = doctorRepository.findByEmail(loginRequest.email());
 
         if (doctor == null) return null;
 
         boolean valid = passwordEncoder.matches(
-                doctorLogin.password(),
+                loginRequest.password(),
                 doctor.getPassword()
         );
 
@@ -117,12 +114,12 @@ public class Service {
         return tokenService.generateToken(user);
     }
 
-    public String validatePatient(PatientLoginDTO patientLoginDTO) {
-        Patient patient = patientRepository.findByEmail(patientLoginDTO.email());
+    public String validatePatient(EmailLoginDTO loginRequest) {
+        Patient patient = patientRepository.findByEmail(loginRequest.email());
         if (patient == null) return null;
 
         boolean valid = passwordEncoder.matches(
-                patientLoginDTO.password(),
+                loginRequest.password(),
                 patient.getPassword()
         );
 
