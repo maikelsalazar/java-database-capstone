@@ -1,9 +1,6 @@
 import { openModal } from "../components/modals.js";
-import { API_BASE_URL } from "../config/config.js";
+import { LOGIN_ADMIN_URL, LOGIN_DOCTOR_URL } from "../config/config.js";
 import { setTokenAndRole } from "../util.js";
-
-const ADMIN_API = `${API_BASE_URL}/admin/login`;
-const DOCTOR_API = `${API_BASE_URL}/doctors/login`;
 
 document.addEventListener("DOMContentLoaded", () => {
     const adminLogin = document.getElementById("adminLoginBtn");
@@ -50,7 +47,7 @@ export async function adminLoginHandler() {
     const adminCredentials = { username, password };
 
     try {
-        const response = await fetch(ADMIN_API, {
+        const response = await fetch(LOGIN_ADMIN_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -120,7 +117,7 @@ export async function doctorLoginHandler() {
     const credentials = { email, password };
 
     try {
-        const response = await fetch(DOCTOR_API, {
+        const response = await fetch(LOGIN_DOCTOR_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

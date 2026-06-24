@@ -32,8 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class DoctorControllerIntegrationTest {
-    private static final String LOGIN_URI = "/api/doctors/login";
-    private static final String SAVE_DOCTORS_URI = "/api/doctors/";
+    private static final String LOGIN_URI = "/api/doctor/login";
+    private static final String SAVE_DOCTORS_URI = "/api/doctor/";
 
     @Autowired
     private MockMvc mockMvc;

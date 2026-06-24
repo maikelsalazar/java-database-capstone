@@ -1,6 +1,4 @@
-import { API_BASE_URL } from "../config/config.js"
-
-const DOCTOR_API = `${API_BASE_URL}/doctors`
+import { DOCTOR_API } from "../config/config.js"
 
 async function fetchDoctors(url) {
   try {

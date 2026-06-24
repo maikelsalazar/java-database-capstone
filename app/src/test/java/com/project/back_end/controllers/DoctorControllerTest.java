@@ -41,7 +41,7 @@ public class DoctorControllerTest {
 
         when(doctorService.getDoctors()).thenReturn(mockResponse);
 
-        mockMvc.perform(get("/api/doctors/list"))
+        mockMvc.perform(get("/api/doctor/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.doctors").isArray())
                 .andExpect(jsonPath("$.doctors[0].id").value(1))
@@ -67,7 +67,7 @@ public class DoctorControllerTest {
     void shouldReturnEmptyList() throws Exception {
         when(doctorService.getDoctors()).thenReturn(new DoctorsDTO(List.of()));
 
-        mockMvc.perform(get("/api/doctors/list"))
+        mockMvc.perform(get("/api/doctor/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.doctors").isArray())
                 .andExpect(jsonPath("$.doctors.length()").value(0));
