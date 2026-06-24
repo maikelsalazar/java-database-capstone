@@ -2,6 +2,7 @@
 package com.project.back_end.controllers;
 
 import com.project.back_end.DTO.AdminLoginDTO;
+import com.project.back_end.DTO.LoginResponseDTO;
 import com.project.back_end.services.Service;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping("${api.path}admin")
 public class AdminController {
@@ -23,27 +21,15 @@ public class AdminController {
     private Service service;
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> adminLogin(@Valid @RequestBody AdminLoginDTO adminRequested) {
-        String token = service.validateAdmin(adminRequested);
-
-        return handleResponse(token);
-    }
-
-    private ResponseEntity<Map<String, Object>> handleResponse(String token) {
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<LoginResponseDTO> adminLogin(@Valid @RequestBody AdminLoginDTO loginRequest) {
+        String token = service.validateAdmin(loginRequest);
 
         if (token == null) {
-            response.put("success", false);
-            response.put("message", "Invalid credentials");
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(response);
+                    .body(LoginResponseDTO.failure());
         }
 
-        response.put("success", true);
-        response.put("token", token);
-        response.put("message", "Login successful");
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(LoginResponseDTO.success(token));
     }
 }
