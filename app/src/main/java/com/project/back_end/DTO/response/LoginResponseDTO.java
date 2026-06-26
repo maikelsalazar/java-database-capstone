@@ -1,4 +1,4 @@
-package com.project.back_end.DTO;
+package com.project.back_end.DTO.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

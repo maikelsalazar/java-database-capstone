@@ -1,7 +1,13 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.DTO.*;
-import com.project.back_end.security.Role;
+import com.project.back_end.DTO.AppointmentDTO;
+import com.project.back_end.DTO.EmailLoginDTO;
+import com.project.back_end.DTO.PatientCreateDTO;
+import com.project.back_end.DTO.PatientDTO;
+import com.project.back_end.DTO.response.ApiDataResponseDTO;
+import com.project.back_end.DTO.response.ApiResponseDTO;
+import com.project.back_end.DTO.response.LoginResponseDTO;
+import com.project.back_end.DTO.response.ResponseKeys;
 import com.project.back_end.services.PatientService;
 import com.project.back_end.services.Service;
 import jakarta.validation.Valid;
@@ -9,9 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("${api.path}patient")
@@ -49,37 +53,29 @@ public class PatientController {
     }
 
     @GetMapping("/{token}")
-    public ResponseEntity<Map<String, PatientDTO>> getPatient(@PathVariable String token) {
-        service.validateTokenOrThrow(token, Role.PATIENT);
-
-        String email = service.extractEmailFromToken(token);
+    public ResponseEntity<ApiDataResponseDTO> getPatient(@PathVariable String token) {
+        String email = service.validateAndGetPatientEmailFromToken(token);
 
         PatientDTO patient = patientService.getPatient(email);
 
-        Map<String, PatientDTO> response = new HashMap<>();
-        response.put("patient", patient);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiDataResponseDTO.of(ResponseKeys.PATIENT, patient)
+        );
     }
 
     @GetMapping("/{id}/patient/{token}")
-    public ResponseEntity<Map<String, Object>> getPatientAppointment(
+    public ResponseEntity<ApiDataResponseDTO> getPatientAppointment(
             @PathVariable Long id,
             @PathVariable String token) {
 
-        service.validateTokenOrThrow(token, Role.PATIENT);
-
-        String email = service.extractEmailFromToken(token);
+        String email = service.validateAndGetPatientEmailFromToken(token);
 
         patientService.validateOwnershipOrThrow(id, email);
 
-        List<AppointmentDTO> patientAppointments =  patientService.getPatientAppointments(id);
+        List<AppointmentDTO> patientAppointments = patientService.getPatientAppointments(id);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("appointments", patientAppointments);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiDataResponseDTO.of(ResponseKeys.APPOINTMENTS, patientAppointments)
+        );
     }
 }
-
-

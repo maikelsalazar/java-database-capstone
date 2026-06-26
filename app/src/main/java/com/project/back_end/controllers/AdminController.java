@@ -2,7 +2,7 @@
 package com.project.back_end.controllers;
 
 import com.project.back_end.DTO.AdminLoginDTO;
-import com.project.back_end.DTO.LoginResponseDTO;
+import com.project.back_end.DTO.response.LoginResponseDTO;
 import com.project.back_end.services.Service;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

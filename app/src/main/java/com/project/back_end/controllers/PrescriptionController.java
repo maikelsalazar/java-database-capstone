@@ -1,9 +1,8 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.DTO.ApiResponseDTO;
+import com.project.back_end.DTO.response.ApiResponseDTO;
 import com.project.back_end.DTO.PrescriptionCreateDTO;
 import com.project.back_end.DTO.PrescriptionListDTO;
-import com.project.back_end.security.Role;
 import com.project.back_end.services.PrescriptionService;
 import com.project.back_end.services.Service;
 import jakarta.validation.Valid;

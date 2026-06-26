@@ -1,7 +1,11 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.DTO.*;
-import com.project.back_end.security.Role;
+import com.project.back_end.DTO.AppointmentCreateDTO;
+import com.project.back_end.DTO.AppointmentUpdateDTO;
+import com.project.back_end.DTO.DoctorAppointmentDTO;
+import com.project.back_end.DTO.response.ApiDataResponseDTO;
+import com.project.back_end.DTO.response.ApiResponseDTO;
+import com.project.back_end.DTO.response.ResponseKeys;
 import com.project.back_end.services.AppointmentService;
 import com.project.back_end.services.Service;
 import jakarta.validation.Valid;
@@ -53,7 +57,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/{appointmentDate}/{token}")
-    public ResponseEntity<DoctorAppointmentsResponseDTO> getAppointmentsByDate(
+    public ResponseEntity<ApiDataResponseDTO> getAppointmentsByDate(
             @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate appointmentDate,
             @PathVariable String token
     ) {
@@ -63,12 +67,12 @@ public class AppointmentController {
                 .getAppointmentsByDate(appointmentDate, email);
 
         return ResponseEntity.ok(
-                new DoctorAppointmentsResponseDTO(appointments)
+                ApiDataResponseDTO.of(ResponseKeys.APPOINTMENTS, appointments)
         );
     }
 
     @GetMapping("/{appointmentDate}/search/{patientName}/{token}")
-    public ResponseEntity<DoctorAppointmentsResponseDTO> getAppointmentsByDateAndPatientName(
+    public ResponseEntity<ApiDataResponseDTO> getAppointmentsByDateAndPatientName(
             @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate appointmentDate,
             @PathVariable String patientName,
             @PathVariable String token
@@ -79,7 +83,7 @@ public class AppointmentController {
                 .getAppointmentsByDateAndName(appointmentDate, patientName, email);
 
         return ResponseEntity.ok(
-                new DoctorAppointmentsResponseDTO(appointments)
+                ApiDataResponseDTO.of(ResponseKeys.APPOINTMENTS, appointments)
         );
     }
 }

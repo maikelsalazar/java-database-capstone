@@ -1,7 +1,7 @@
 package com.project.back_end.controllers;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.project.back_end.DTO.ApiResponseDTO;
+import com.project.back_end.DTO.response.ApiResponseDTO;
 import com.project.back_end.exceptions.*;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
