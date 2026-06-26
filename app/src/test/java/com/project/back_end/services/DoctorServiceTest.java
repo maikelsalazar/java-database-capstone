@@ -1,6 +1,6 @@
 package com.project.back_end.services;
 
-import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.repo.AppointmentRepository;
@@ -45,9 +45,9 @@ public class DoctorServiceTest {
     void shouldGetDoctors() {
         when(doctorRepository.findAll()).thenReturn(List.of(buildDoctor()));
 
-        DoctorsDTO result = doctorService.getDoctors();
+        List<DoctorDTO> result = doctorService.getDoctors();
 
-        assertEquals(1, result.doctors().size());
+        assertEquals(1, result.size());
         verify(doctorRepository).findAll();
     }
 
@@ -55,10 +55,10 @@ public class DoctorServiceTest {
     void shouldFindDoctorsByName() {
         when(doctorRepository.findByName(NAME)).thenReturn(List.of(buildDoctor()));
 
-        DoctorsDTO result = doctorService.findDoctorByName(NAME);
+        List<DoctorDTO> result = doctorService.findDoctorByName(NAME);
 
-        assertEquals(1, result.doctors().size());
-        assertEquals(FULL_NAME, result.doctors().get(0).getName());
+        assertEquals(1, result.size());
+        assertEquals(FULL_NAME, result.get(0).getName());
 
         verify(doctorRepository).findByName(NAME);
     }
@@ -67,9 +67,9 @@ public class DoctorServiceTest {
     void shouldFindDoctorsBySpecialty() {
         when(doctorRepository.findBySpecialty(SPECIALTY)).thenReturn(List.of(buildDoctor()));
 
-        DoctorsDTO result = doctorService.findDoctorBySpecialty(SPECIALTY);
+        List<DoctorDTO> result = doctorService.findDoctorBySpecialty(SPECIALTY);
 
-        assertEquals(1, result.doctors().size());
+        assertEquals(1, result.size());
 
         verify(doctorRepository).findBySpecialty(SPECIALTY);
     }
@@ -79,12 +79,12 @@ public class DoctorServiceTest {
         when(doctorRepository.findByTime(AM)).thenReturn(List.of(buildDoctor()));
         when(doctorRepository.findByTime(PM)).thenReturn(List.of(buildDoctor()));
 
-        DoctorsDTO amResult = doctorService.findDoctorByTime(AM);
-        DoctorsDTO pmResult = doctorService.findDoctorByTime(PM);
+        List<DoctorDTO> amResult = doctorService.findDoctorByTime(AM);
+        List<DoctorDTO> pmResult = doctorService.findDoctorByTime(PM);
 
-        assertEquals(1, amResult.doctors().size());
-        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), amResult.doctors().get(0).getAvailableTimes());
-        assertEquals(List.of(AvailableTime.SLOT_13_14), pmResult.doctors().get(0).getAvailableTimes());
+        assertEquals(1, amResult.size());
+        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), amResult.get(0).getAvailableTimes());
+        assertEquals(List.of(AvailableTime.SLOT_13_14), pmResult.get(0).getAvailableTimes());
 
         verify(doctorRepository).findByTime(AM);
         verify(doctorRepository).findByTime(PM);
@@ -97,11 +97,11 @@ public class DoctorServiceTest {
         when(doctorRepository.findByNameAndTime(NAME, AM))
                 .thenReturn(List.of(buildDoctor()));
 
-        DoctorsDTO result = doctorService.filterDoctorByNameAndTime(NAME, AM);
+        List<DoctorDTO> result = doctorService.filterDoctorByNameAndTime(NAME, AM);
 
-        assertEquals(1, result.doctors().size());
-        assertEquals(FULL_NAME, result.doctors().get(0).getName());
-        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.doctors().get(0).getAvailableTimes());
+        assertEquals(1, result.size());
+        assertEquals(FULL_NAME, result.get(0).getName());
+        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.get(0).getAvailableTimes());
 
         verify(doctorRepository).findByNameAndTime(NAME, AM);
     }
@@ -111,12 +111,12 @@ public class DoctorServiceTest {
         when(doctorRepository.findByNameAndSpecialty(NAME, SPECIALTY))
                 .thenReturn(List.of(buildDoctor()));
 
-        DoctorsDTO result =
+        List<DoctorDTO> result =
                 doctorService.filterDoctorByNameAndSpecialty(NAME, SPECIALTY);
 
-        assertEquals(1, result.doctors().size());
-        assertEquals(FULL_NAME, result.doctors().get(0).getName());
-        assertEquals(SPECIALTY, result.doctors().get(0).getSpecialty());
+        assertEquals(1, result.size());
+        assertEquals(FULL_NAME, result.get(0).getName());
+        assertEquals(SPECIALTY, result.get(0).getSpecialty());
 
         verify(doctorRepository).findByNameAndSpecialty(NAME, SPECIALTY);
     }
@@ -126,12 +126,12 @@ public class DoctorServiceTest {
         when(doctorRepository.findByTimeAndSpecialty(AM, SPECIALTY))
                 .thenReturn(List.of(buildDoctor()));
 
-        DoctorsDTO result =
+        List<DoctorDTO> result =
                 doctorService.filterDoctorByTimeAndSpecialty(AM, SPECIALTY);
 
-        assertEquals(1, result.doctors().size());
-        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.doctors().get(0).getAvailableTimes());
-        assertEquals(SPECIALTY, result.doctors().get(0).getSpecialty());
+        assertEquals(1, result.size());
+        assertEquals(List.of(AvailableTime.SLOT_09_10, AvailableTime.SLOT_10_11), result.get(0).getAvailableTimes());
+        assertEquals(SPECIALTY, result.get(0).getSpecialty());
 
         verify(doctorRepository).findByTimeAndSpecialty(AM, SPECIALTY);
     }
@@ -141,12 +141,12 @@ public class DoctorServiceTest {
         when(doctorRepository.findByTimeAndSpecialty(PM, SPECIALTY))
                 .thenReturn(List.of(buildDoctor()));
 
-        DoctorsDTO result =
+        List<DoctorDTO> result =
                 doctorService.filterDoctorByTimeAndSpecialty(PM, SPECIALTY);
 
-        assertEquals(1, result.doctors().size());
-        assertEquals(List.of(AvailableTime.SLOT_13_14), result.doctors().get(0).getAvailableTimes());
-        assertEquals(SPECIALTY, result.doctors().get(0).getSpecialty());
+        assertEquals(1, result.size());
+        assertEquals(List.of(AvailableTime.SLOT_13_14), result.get(0).getAvailableTimes());
+        assertEquals(SPECIALTY, result.get(0).getSpecialty());
 
         verify(doctorRepository).findByTimeAndSpecialty(PM, SPECIALTY);
     }
@@ -156,13 +156,13 @@ public class DoctorServiceTest {
         when(doctorRepository.findByNameAndTimeAndSpecialty(NAME, PM, SPECIALTY))
                 .thenReturn(List.of(buildDoctor()));
 
-        DoctorsDTO result =
+        List<DoctorDTO> result =
                 doctorService.filterDoctorsByNameAndSpecialtyAndTime(NAME, PM, SPECIALTY);
 
-        assertEquals(1, result.doctors().size());
-        assertEquals(FULL_NAME, result.doctors().get(0).getName());
-        assertEquals(SPECIALTY, result.doctors().get(0).getSpecialty());
-        assertEquals(List.of(AvailableTime.SLOT_13_14), result.doctors().get(0).getAvailableTimes());
+        assertEquals(1, result.size());
+        assertEquals(FULL_NAME, result.get(0).getName());
+        assertEquals(SPECIALTY, result.get(0).getSpecialty());
+        assertEquals(List.of(AvailableTime.SLOT_13_14), result.get(0).getAvailableTimes());
 
         verify(doctorRepository).findByNameAndTimeAndSpecialty(NAME, PM, SPECIALTY);
     }
@@ -174,10 +174,10 @@ public class DoctorServiceTest {
         when(doctorRepository.findByName("John"))
                 .thenReturn(List.of());
 
-        DoctorsDTO result =
+        List<DoctorDTO> result =
                 doctorService.findDoctorByName("John");
 
-        assertEquals(0, result.doctors().size());
+        assertEquals(0, result.size());
 
         verify(doctorRepository).findByName("John");
     }
@@ -187,9 +187,9 @@ public class DoctorServiceTest {
         when(doctorRepository.findBySpecialty("Foo"))
                 .thenReturn(List.of());
 
-        DoctorsDTO result = doctorService.findDoctorByName("Foo");
+        List<DoctorDTO> result = doctorService.findDoctorByName("Foo");
 
-        assertEquals(0, result.doctors().size());
+        assertEquals(0, result.size());
 
         verify(doctorRepository).findByName("Foo");
     }
@@ -198,9 +198,9 @@ public class DoctorServiceTest {
     void shouldReturnEmptyOrSafeBehaviorOnInvalidDataFlow() {
         when(doctorRepository.findByTime("INVALID")).thenReturn(List.of());
 
-        DoctorsDTO result = doctorService.findDoctorByTime("INVALID");
+        List<DoctorDTO> result = doctorService.findDoctorByTime("INVALID");
 
-        assertEquals(0, result.doctors().size());
+        assertEquals(0, result.size());
     }
 
 

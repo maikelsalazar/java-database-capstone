@@ -12,6 +12,8 @@ import com.project.back_end.security.Role;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
+
 @org.springframework.stereotype.Service
 public class Service {
 
@@ -45,7 +47,7 @@ public class Service {
         this.tokenService = tokenService;
     }
 
-    public DoctorsDTO filterDoctor(String nameQuery, String timeQuery, String specialtyQuery) {
+    public List<DoctorDTO> filterDoctor(String nameQuery, String timeQuery, String specialtyQuery) {
         String name = sanitizeQuery(nameQuery);
         String time = sanitizeQuery(timeQuery);
         String specialty = sanitizeQuery(specialtyQuery);

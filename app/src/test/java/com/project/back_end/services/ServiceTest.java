@@ -1,6 +1,5 @@
 package com.project.back_end.services;
 
-import com.project.back_end.DTO.DoctorsDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,7 +32,7 @@ public class ServiceTest {
     @Test
     void shouldRouteToFindByName() {
         when(doctorService.findDoctorByName(FILTER_NAME))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor(FILTER_NAME, "", "");
 
@@ -44,7 +43,7 @@ public class ServiceTest {
     @Test
     void shouldRouteToFindByTime() {
         when(doctorService.findDoctorByTime(FILTER_TIME))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor("", FILTER_TIME, "");
 
@@ -55,7 +54,7 @@ public class ServiceTest {
     @Test
     void shouldRouteToFindBySpecialty() {
         when(doctorService.findDoctorBySpecialty(FILTER_SPECIALTY))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor("", "", FILTER_SPECIALTY);
 
@@ -66,7 +65,7 @@ public class ServiceTest {
     @Test
     void shouldRouteToFilterByNameAndTime() {
         when(doctorService.filterDoctorByNameAndTime(FILTER_NAME, FILTER_TIME))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor(FILTER_NAME, FILTER_TIME, "");
 
@@ -77,7 +76,7 @@ public class ServiceTest {
     @Test
     void shouldRouteToFilterDoctorByNameAndSpecialty() {
         when(doctorService.filterDoctorByNameAndSpecialty(FILTER_NAME, FILTER_SPECIALTY))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor(FILTER_NAME, "", FILTER_SPECIALTY);
 
@@ -88,7 +87,7 @@ public class ServiceTest {
     @Test
     void shouldRouteToFilterDoctorByTimeAndSpecialty() {
         when(doctorService.filterDoctorByTimeAndSpecialty(FILTER_TIME, FILTER_SPECIALTY))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor("", FILTER_TIME, FILTER_SPECIALTY);
 
@@ -99,7 +98,7 @@ public class ServiceTest {
     @Test
     void shouldRouteToFilterDoctorsByNameSpecialtyAndTime() {
         when(doctorService.filterDoctorsByNameAndSpecialtyAndTime(FILTER_NAME, FILTER_TIME, FILTER_SPECIALTY))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor(FILTER_NAME, FILTER_TIME, FILTER_SPECIALTY);
 
@@ -110,7 +109,8 @@ public class ServiceTest {
 
     @Test
     void shouldRouteToGetDoctorsWhenThereIsNoFilters() {
-        when(doctorService.getDoctors()).thenReturn(new DoctorsDTO(List.of()));
+        when(doctorService.getDoctors())
+                .thenReturn(List.of());
 
         service.filterDoctor("", "", "");
 
@@ -121,7 +121,7 @@ public class ServiceTest {
     @Test
     void shouldHandleNullInputs() {
         when(doctorService.getDoctors())
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor(null, null, null);
 
@@ -132,7 +132,7 @@ public class ServiceTest {
     @Test
     void shouldTrimTrailingWhitespacesOnRoutingByName() {
         when(doctorService.findDoctorByName(FILTER_NAME))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor("  Jane  ", "", "");
 
@@ -143,7 +143,7 @@ public class ServiceTest {
     @Test
     void shouldTrimTrailingWhitespacesOnRoutingByTime() {
         when(doctorService.findDoctorByTime(FILTER_TIME))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor("  ", "  AM  ", "  ");
 
@@ -154,7 +154,7 @@ public class ServiceTest {
     @Test
     void shouldTrimTrailingWhitespacesOnRoutingBySpecialty() {
         when(doctorService.findDoctorBySpecialty(FILTER_SPECIALTY))
-                .thenReturn(new DoctorsDTO(List.of()));
+                .thenReturn(List.of());
 
         service.filterDoctor("  ", "  ", "  Cardiologist ");
 

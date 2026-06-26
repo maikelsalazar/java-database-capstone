@@ -1,10 +1,12 @@
 package com.project.back_end.controllers;
 
 import com.project.back_end.DTO.DoctorCreateDTO;
-import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.DTO.EmailLoginDTO;
+import com.project.back_end.DTO.response.ApiDataResponseDTO;
 import com.project.back_end.DTO.response.ApiResponseDTO;
 import com.project.back_end.DTO.response.LoginResponseDTO;
+import com.project.back_end.DTO.response.ResponseKeys;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
@@ -12,6 +14,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("${api.path}doctor")
@@ -27,20 +31,20 @@ public class DoctorController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<DoctorsDTO> getDoctor() {
-        DoctorsDTO doctorsDTO = doctorService.getDoctors();
+    public ResponseEntity<ApiDataResponseDTO> getDoctor() {
+        List<DoctorDTO> doctors = doctorService.getDoctors();
 
-        return ResponseEntity.ok(doctorsDTO);
+        return ResponseEntity.ok(ApiDataResponseDTO.of(ResponseKeys.DOCTORS, doctors));
     }
 
     @GetMapping("/filter/{name}/{time}/{specialty}")
-    public ResponseEntity<DoctorsDTO> filter(
+    public ResponseEntity<ApiDataResponseDTO> filter(
             @PathVariable String name,
             @PathVariable String time,
             @PathVariable String specialty) {
-        DoctorsDTO doctorsDTO = service.filterDoctor(name, time, specialty);
+        List<DoctorDTO> doctors = service.filterDoctor(name, time, specialty);
 
-        return ResponseEntity.ok(doctorsDTO);
+        return ResponseEntity.ok(ApiDataResponseDTO.of(ResponseKeys.DOCTORS, doctors));
     }
 
     @PostMapping("/login")

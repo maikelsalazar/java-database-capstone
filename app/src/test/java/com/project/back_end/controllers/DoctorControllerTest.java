@@ -1,7 +1,6 @@
 package com.project.back_end.controllers;
 
 import com.project.back_end.DTO.DoctorDTO;
-import com.project.back_end.DTO.DoctorsDTO;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
@@ -37,9 +36,7 @@ public class DoctorControllerTest {
 
         List<DoctorDTO> doctorList = buildDoctors();
 
-        DoctorsDTO mockResponse = new DoctorsDTO(doctorList);
-
-        when(doctorService.getDoctors()).thenReturn(mockResponse);
+        when(doctorService.getDoctors()).thenReturn(doctorList);
 
         mockMvc.perform(get("/api/doctor/list"))
                 .andExpect(status().isOk())
@@ -65,7 +62,7 @@ public class DoctorControllerTest {
 
     @Test
     void shouldReturnEmptyList() throws Exception {
-        when(doctorService.getDoctors()).thenReturn(new DoctorsDTO(List.of()));
+        when(doctorService.getDoctors()).thenReturn(List.of());
 
         mockMvc.perform(get("/api/doctor/list"))
                 .andExpect(status().isOk())

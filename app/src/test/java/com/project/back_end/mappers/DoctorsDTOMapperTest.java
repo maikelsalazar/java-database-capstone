@@ -1,7 +1,6 @@
 package com.project.back_end.mappers;
 
 import com.project.back_end.DTO.DoctorDTO;
-import com.project.back_end.DTO.DoctorsDTO;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.models.Doctor;
 import org.junit.jupiter.api.Test;
@@ -28,10 +27,10 @@ public class DoctorsDTOMapperTest {
         ));
 
 
-        DoctorsDTO expectedDTO = new DoctorsDTO(List.of(expectedDoctorDTO));
-        DoctorsDTO actualDTO = DoctorsDTOMapper.fromDoctorList(doctorList, "AM");
+        List<DoctorDTO> expectedDTO = List.of(expectedDoctorDTO);
+        List<DoctorDTO> actualDTO = DoctorMapper.toDTOList(doctorList, "AM");
 
-        assertEquals(expectedDTO.doctors().get(0).getAvailableTimes(), actualDTO.doctors().get(0).getAvailableTimes());
+        assertEquals(expectedDTO.get(0).getAvailableTimes(), actualDTO.get(0).getAvailableTimes());
 
     }
 

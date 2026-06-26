@@ -1,10 +1,9 @@
 package com.project.back_end.services;
 
 import com.project.back_end.DTO.DoctorCreateDTO;
-import com.project.back_end.DTO.DoctorsDTO;
+import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.exceptions.DuplicateEmailException;
-import com.project.back_end.mappers.DoctorDTOMapper;
-import com.project.back_end.mappers.DoctorsDTOMapper;
+import com.project.back_end.mappers.DoctorMapper;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.repo.DoctorRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,7 +33,7 @@ public class DoctorService {
             throw new DuplicateEmailException();
         }
 
-        Doctor doctor = DoctorDTOMapper.fromCreate(dto, passwordEncoder);
+        Doctor doctor = DoctorMapper.fromCreateDTO(dto, passwordEncoder);
         doctorRepository.save(doctor);
     }
 
@@ -43,10 +42,10 @@ public class DoctorService {
     }
 
     @Transactional
-    public DoctorsDTO getDoctors() {
+    public List<DoctorDTO> getDoctors() {
         List<Doctor> doctorList = doctorRepository.findAll();
 
-        return DoctorsDTOMapper.fromDoctorList(doctorList);
+        return DoctorMapper.toDTOList(doctorList);
     }
 
     @Transactional
@@ -59,51 +58,51 @@ public class DoctorService {
     }
 
     @Transactional
-    public DoctorsDTO findDoctorByName(String name) {
+    public List<DoctorDTO> findDoctorByName(String name) {
         List<Doctor> doctorList = doctorRepository.findByName(name);
 
-        return DoctorsDTOMapper.fromDoctorList(doctorList);
+        return DoctorMapper.toDTOList(doctorList);
     }
 
     @Transactional
-    public DoctorsDTO findDoctorByTime(String time) {
+    public List<DoctorDTO> findDoctorByTime(String time) {
         List<Doctor> doctorList = doctorRepository.findByTime(time);
 
-        return DoctorsDTOMapper.fromDoctorList(doctorList, time);
+        return DoctorMapper.toDTOList(doctorList, time);
     }
 
     @Transactional
-    public DoctorsDTO findDoctorBySpecialty(String specialty) {
+    public List<DoctorDTO> findDoctorBySpecialty(String specialty) {
         List<Doctor> doctorList = doctorRepository.findBySpecialty(specialty);
 
-        return DoctorsDTOMapper.fromDoctorList(doctorList);
+        return DoctorMapper.toDTOList(doctorList);
     }
 
     @Transactional
-    public DoctorsDTO filterDoctorByNameAndTime(String name, String time) {
+    public List<DoctorDTO> filterDoctorByNameAndTime(String name, String time) {
         List<Doctor> doctorList = doctorRepository.findByNameAndTime(name, time);
 
-        return DoctorsDTOMapper.fromDoctorList(doctorList, time);
+        return DoctorMapper.toDTOList(doctorList, time);
     }
 
     @Transactional
-    public DoctorsDTO filterDoctorByNameAndSpecialty(String name, String specialty) {
+    public List<DoctorDTO> filterDoctorByNameAndSpecialty(String name, String specialty) {
         List<Doctor> doctorList = doctorRepository.findByNameAndSpecialty(name, specialty);
 
-        return DoctorsDTOMapper.fromDoctorList(doctorList);
+        return DoctorMapper.toDTOList(doctorList);
     }
 
     @Transactional
-    public DoctorsDTO filterDoctorByTimeAndSpecialty(String time, String specialty) {
+    public List<DoctorDTO> filterDoctorByTimeAndSpecialty(String time, String specialty) {
         List<Doctor> doctorList = doctorRepository.findByTimeAndSpecialty(time, specialty);
 
-        return DoctorsDTOMapper.fromDoctorList(doctorList, time);
+        return DoctorMapper.toDTOList(doctorList, time);
     }
 
     @Transactional
-    public DoctorsDTO filterDoctorsByNameAndSpecialtyAndTime(String name, String time, String specialty) {
+    public List<DoctorDTO> filterDoctorsByNameAndSpecialtyAndTime(String name, String time, String specialty) {
         List<Doctor> doctorList = doctorRepository.findByNameAndTimeAndSpecialty(name, time, specialty);
 
-        return DoctorsDTOMapper.fromDoctorList(doctorList, time);
+        return DoctorMapper.toDTOList(doctorList, time);
     }
 }
