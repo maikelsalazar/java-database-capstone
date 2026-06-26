@@ -8,6 +8,7 @@ import com.project.back_end.models.Patient;
 import com.project.back_end.repo.AdminRepository;
 import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.PatientRepository;
+import com.project.back_end.security.Role;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -138,6 +139,18 @@ public class Service {
         if (!validateToken(userToken, role)) {
             throw new NotAllowedException();
         }
+    }
+
+    public String validateAndGetDoctorEmailFromToken(String token) {
+        validateTokenOrThrow(token, Role.DOCTOR);
+
+        return extractEmailFromToken(token);
+    }
+
+    public String validateAndGetPatientEmailFromToken(String token) {
+        validateTokenOrThrow(token, Role.PATIENT);
+
+        return extractEmailFromToken(token);
     }
 
     public String extractEmailFromToken(String token) {

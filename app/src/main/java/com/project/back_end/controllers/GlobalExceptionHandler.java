@@ -3,6 +3,7 @@ package com.project.back_end.controllers;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.project.back_end.DTO.ApiResponseDTO;
 import com.project.back_end.exceptions.*;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,6 +74,7 @@ public class GlobalExceptionHandler {
             DuplicateEmailException.class,
             IllegalAppointmentUpdateException.class,
             AppointmentAlreadyExistsException.class,
+            AppointmentAlreadyHasPrescriptionException.class,
             UnavailableDoctorException.class
 
     })
@@ -91,7 +93,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UnauthorizedException.class,
-            SignatureException.class
+            SignatureException.class,
+            MalformedJwtException.class
     })
     public ResponseEntity<ApiResponseDTO> handleUnauthorized(Exception ex) {
         return failure(HttpStatus.UNAUTHORIZED, "Invalid or expired token");

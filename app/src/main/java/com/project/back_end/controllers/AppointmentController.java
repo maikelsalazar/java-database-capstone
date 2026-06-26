@@ -30,7 +30,7 @@ public class AppointmentController {
             @RequestBody @Valid  AppointmentCreateDTO appointmentCreate
     ) {
 
-        String email = getPatientEmailFromToken(token);
+        String email = service.validateAndGetPatientEmailFromToken(token);
 
         appointmentService.createAppointment(appointmentCreate, email);
 
@@ -45,7 +45,7 @@ public class AppointmentController {
             @RequestBody @Valid AppointmentUpdateDTO appointmentUpdate
     ) {
 
-        String email = getPatientEmailFromToken(token);
+        String email = service.validateAndGetPatientEmailFromToken(token);
 
         appointmentService.updateAppointment(appointmentUpdate, email);
 
@@ -57,7 +57,7 @@ public class AppointmentController {
             @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate appointmentDate,
             @PathVariable String token
     ) {
-        String email = getDoctorEmailFromToken(token);
+        String email = service.validateAndGetDoctorEmailFromToken(token);
 
         List<DoctorAppointmentDTO> appointments = appointmentService
                 .getAppointmentsByDate(appointmentDate, email);
@@ -73,7 +73,7 @@ public class AppointmentController {
             @PathVariable String patientName,
             @PathVariable String token
     ) {
-        String email = getDoctorEmailFromToken(token);
+        String email = service.validateAndGetDoctorEmailFromToken(token);
 
         List<DoctorAppointmentDTO> appointments = appointmentService
                 .getAppointmentsByDateAndName(appointmentDate, patientName, email);
@@ -81,17 +81,5 @@ public class AppointmentController {
         return ResponseEntity.ok(
                 new DoctorAppointmentsResponseDTO(appointments)
         );
-    }
-
-    private String getDoctorEmailFromToken(String token) {
-        service.validateTokenOrThrow(token, Role.DOCTOR);
-
-        return service.extractEmailFromToken(token);
-    }
-
-    private String getPatientEmailFromToken(String token) {
-        service.validateTokenOrThrow(token, Role.PATIENT);
-
-        return service.extractEmailFromToken(token);
     }
 }
