@@ -19,9 +19,6 @@ export async function adminLoadDoctorCards() {
 
 export async function adminAddDoctor() {
 
-
-
-
   // doctor's information
   const name = document.getElementById("doctorName").value.trim();
   const specialty = document.getElementById("specialty").value.trim();

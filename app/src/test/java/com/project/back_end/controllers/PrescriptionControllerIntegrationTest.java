@@ -6,27 +6,17 @@ import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Patient;
 import com.project.back_end.models.Prescription;
-import com.project.back_end.repo.AppointmentRepository;
-import com.project.back_end.repo.DoctorRepository;
-import com.project.back_end.repo.PatientRepository;
-import com.project.back_end.repo.PrescriptionRepository;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.TokenService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 
@@ -36,26 +26,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Testcontainers
-@SpringBootTest
 @AutoConfigureMockMvc
-public class PrescriptionControllerIntegrationTest {
+@ActiveProfiles("test")
+public class PrescriptionControllerIntegrationTest extends IntegrationTest {
     private static final String PRESCRIPTION_API = "/api/prescription";
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private PrescriptionRepository prescriptionRepository;
-
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private DoctorRepository doctorRepository;
-
-    @Autowired
-    private PatientRepository patientRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -65,22 +42,6 @@ public class PrescriptionControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:4.0.6");
-
-    @DynamicPropertySource
-    static void mongoProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-    }
-
-    @BeforeEach
-    void setUp() {
-        prescriptionRepository.deleteAll();
-        appointmentRepository.deleteAll();
-        doctorRepository.deleteAll();
-        patientRepository.deleteAll();
-    }
 
     @Test
     void shouldCreatePrescription() throws Exception {

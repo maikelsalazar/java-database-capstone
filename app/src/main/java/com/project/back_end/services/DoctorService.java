@@ -2,6 +2,8 @@ package com.project.back_end.services;
 
 import com.project.back_end.DTO.DoctorCreateDTO;
 import com.project.back_end.DTO.DoctorDTO;
+import com.project.back_end.DTO.DoctorProfileUpdateDTO;
+import com.project.back_end.exceptions.DoctorNotFoundException;
 import com.project.back_end.exceptions.DuplicateEmailException;
 import com.project.back_end.mappers.DoctorMapper;
 import com.project.back_end.models.Doctor;
@@ -37,8 +39,16 @@ public class DoctorService {
         doctorRepository.save(doctor);
     }
 
-    public void updateDoctor() {
-        throw new UnsupportedOperationException("No implemented yet");
+    @Transactional
+    public void updateDoctor(DoctorProfileUpdateDTO dto) {
+        Doctor doctor = doctorRepository
+                .findById(dto.id())
+                .orElseThrow(DoctorNotFoundException::new);
+
+        doctor.setName(dto.name());
+        doctor.setSpecialty(dto.specialty());
+        doctor.setPhone(dto.phone());
+        doctor.setAvailableTimes(dto.availableTimes());
     }
 
     @Transactional

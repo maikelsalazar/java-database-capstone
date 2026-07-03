@@ -1,4 +1,4 @@
-import { deleteDoctorHandler } from "./doctorActions.js";
+import { deleteDoctorHandler, updateDoctorHandler } from "./doctorActions.js";
 import { showBookingOverlay } from "./showBookingOverlay.js";
 import { getPatientData } from "../services/patientServices.js";
 
@@ -49,8 +49,6 @@ export function createDoctorCard(doctor) {
     });
 
     const role = localStorage.getItem("userRole");
-
-
     const action = document.createElement("div");
     switch(role) {
         case 'admin':
@@ -59,7 +57,13 @@ export function createDoctorCard(doctor) {
             deleteButton.dataset.id = doctor.id;
             deleteButton.addEventListener("click", deleteDoctorHandler);
 
+            const updateButton = document.createElement("button");
+            updateButton.textContent = "Update";
+            updateButton.dataset.id = doctor.id;
+            updateButton.addEventListener("click", updateDoctorHandler);
+
             action.classList.add("card-actions");
+            action.appendChild(updateButton);
             action.appendChild(deleteButton);
         break;
         case 'patient':

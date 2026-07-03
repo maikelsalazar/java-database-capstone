@@ -2,6 +2,7 @@ package com.project.back_end.controllers;
 
 import com.project.back_end.DTO.DoctorCreateDTO;
 import com.project.back_end.DTO.DoctorDTO;
+import com.project.back_end.DTO.DoctorProfileUpdateDTO;
 import com.project.back_end.DTO.EmailLoginDTO;
 import com.project.back_end.DTO.response.ApiDataResponseDTO;
 import com.project.back_end.DTO.response.ApiResponseDTO;
@@ -68,6 +69,17 @@ public class DoctorController {
         doctorService.saveDoctor(newDoctorRequest);
 
         return ResponseEntity.ok(ApiResponseDTO.success("Doctor added successfully"));
+    }
+
+    @PutMapping("/{token}")
+    public ResponseEntity<ApiResponseDTO> updateDoctor(
+            @PathVariable String token,
+            @Valid @RequestBody DoctorProfileUpdateDTO doctorToUpdate) {
+
+        service.validateTokenOrThrow(token, Role.ADMIN);
+        doctorService.updateDoctor(doctorToUpdate);
+
+        return ResponseEntity.ok(ApiResponseDTO.success("Doctor updated successfully"));
     }
 
     @DeleteMapping("/{id}/{token}")

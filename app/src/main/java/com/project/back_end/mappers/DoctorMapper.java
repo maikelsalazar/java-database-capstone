@@ -2,6 +2,7 @@ package com.project.back_end.mappers;
 
 import com.project.back_end.DTO.DoctorCreateDTO;
 import com.project.back_end.DTO.DoctorDTO;
+import com.project.back_end.DTO.DoctorProfileUpdateDTO;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.models.Doctor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,9 +67,7 @@ public class DoctorMapper {
         doctor.setName(dto.name());
         doctor.setSpecialty(dto.specialty());
         doctor.setEmail(dto.email());
-        doctor.setPassword(
-                passwordEncoder.encode(dto.password())
-        );
+        doctor.setPassword(passwordEncoder.encode(dto.password()));
         doctor.setPhone(dto.phone());
         doctor.setAvailableTimes(dto.availableTimes());
 

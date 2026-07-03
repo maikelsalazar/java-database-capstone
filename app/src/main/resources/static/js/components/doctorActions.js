@@ -61,6 +61,10 @@ export async function addDoctorHandler() {
   }, 3000);
 };
 
+export function updateDoctorHandler() {
+  alert("Update Doctor " + this.dataset.id);
+};
+
 export async function deleteDoctorHandler() {
   if (confirm("Are you sure you want to delete this doctor")) {
       const { success, message } = await deleteDoctor(this.dataset.id);

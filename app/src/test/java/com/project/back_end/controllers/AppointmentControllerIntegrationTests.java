@@ -9,33 +9,20 @@ import com.project.back_end.builders.AppointmentBuilder;
 import com.project.back_end.builders.DoctorBuilder;
 import com.project.back_end.builders.PatientBuilder;
 import com.project.back_end.enums.AvailableTime;
-import com.project.back_end.exceptions.AppointmentAlreadyExistsException;
-import com.project.back_end.exceptions.IllegalAppointmentUpdateException;
-import com.project.back_end.exceptions.UnavailableDoctorException;
 import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Patient;
-import com.project.back_end.repo.AppointmentRepository;
-import com.project.back_end.repo.DoctorRepository;
-import com.project.back_end.repo.PatientRepository;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.TokenService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -48,11 +35,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@Testcontainers
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class AppointmentControllerIntegrationTests {
+public class AppointmentControllerIntegrationTests extends IntegrationTest {
 
     private static final String APPOINTMENTS_API = "/api/appointments";
     private static final List<AvailableTime> AVAILABLE_TIMES = List.of(
@@ -65,15 +50,6 @@ public class AppointmentControllerIntegrationTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private DoctorRepository doctorRepository;
-
-    @Autowired
-    private PatientRepository patientRepository;
-
-    @Autowired
     private TokenService tokenService;
 
     @Autowired
@@ -84,26 +60,6 @@ public class AppointmentControllerIntegrationTests {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Container
-    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
-            .withDatabaseName("cms")
-            .withUsername("root")
-            .withPassword("password");
-
-    @DynamicPropertySource
-    static void overrideProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mysql::getJdbcUrl);
-        registry.add("spring.datasource.username", mysql::getUsername);
-        registry.add("spring.datasource.password", mysql::getPassword);
-    }
-
-    @BeforeEach
-    void setUp() {
-        appointmentRepository.deleteAll();
-        doctorRepository.deleteAll();
-        patientRepository.deleteAll();
-    }
 
     @Test
     void shouldBookAppointmentSuccessfully() throws Exception {

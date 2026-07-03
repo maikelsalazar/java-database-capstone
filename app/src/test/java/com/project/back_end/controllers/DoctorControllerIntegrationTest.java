@@ -1,7 +1,10 @@
 package com.project.back_end.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.back_end.DTO.DoctorProfileUpdateDTO;
+import com.project.back_end.enums.AvailableTime;
+import com.project.back_end.models.Admin;
 import com.project.back_end.models.Doctor;
-import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.Service;
 import com.project.back_end.services.TokenService;
@@ -9,31 +12,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Testcontainers
-@SpringBootTest
 @AutoConfigureMockMvc
-public class DoctorControllerIntegrationTest {
+@ActiveProfiles("test")
+public class DoctorControllerIntegrationTest extends IntegrationTest {
     private static final String LOGIN_URI = "/api/doctor/login";
-    private static final String SAVE_DOCTORS_URI = "/api/doctor/";
+    private static final String DOCTOR_API = "/api/doctor/";
 
     @Autowired
     private MockMvc mockMvc;
@@ -42,39 +39,19 @@ public class DoctorControllerIntegrationTest {
     private TokenService tokenService;
 
     @Autowired
-    private DoctorRepository doctorRepository;
-
-    @Autowired
     private Service service;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private String adminToken;
 
-    @Container
-    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
-            .withDatabaseName("cms")
-            .withUsername("root")
-            .withPassword("password");
-
-    @DynamicPropertySource
-    static void overrideProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mysql::getJdbcUrl);
-        registry.add("spring.datasource.username", mysql::getUsername);
-        registry.add("spring.datasource.password", mysql::getPassword);
-    }
-
     @BeforeEach
-    void setUp() {
-        doctorRepository.deleteAllInBatch();
-        UserDetails user = User.builder()
-                .username("admin")
-                .password("admin@1234")
-                .roles(Role.ADMIN)
-                .build();
-
-        adminToken = tokenService.generateToken(user);
+    void setAdminToken() {
+        adminToken = getToken("admin", Role.ADMIN);
     }
 
     @Test
@@ -173,6 +150,14 @@ public class DoctorControllerIntegrationTest {
 
     @Test
     void shouldSaveDoctor() throws Exception {
+        Admin admin = new Admin();
+        admin.setUsername("admin");
+        admin.setPassword(
+                passwordEncoder.encode("admin@1234")
+        );
+
+        adminRepository.save(admin);
+
         String doctorData = """
                 {
                     "name": "John Doe",
@@ -188,7 +173,7 @@ public class DoctorControllerIntegrationTest {
                 }
                 """;
 
-        mockMvc.perform(post(SAVE_DOCTORS_URI + "/" + adminToken)
+        mockMvc.perform(post(DOCTOR_API + "/" + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(doctorData))
                 .andExpect(status().isOk())
@@ -222,7 +207,7 @@ public class DoctorControllerIntegrationTest {
                 }
                 """;
 
-        mockMvc.perform(post(SAVE_DOCTORS_URI + "/" + doctorToken)
+        mockMvc.perform(post(DOCTOR_API + "/" + doctorToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(doctorData))
                 .andExpect(status().isForbidden());
@@ -245,7 +230,7 @@ public class DoctorControllerIntegrationTest {
                 }
                 """;
 
-        mockMvc.perform(post(SAVE_DOCTORS_URI + "/xxx.yyy.zzz")
+        mockMvc.perform(post(DOCTOR_API + "/xxx.yyy.zzz")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(doctorData))
                 .andExpect(status().isBadRequest())
@@ -254,7 +239,125 @@ public class DoctorControllerIntegrationTest {
     }
 
     @Test
+    void shouldUpdateDoctor() throws Exception {
+        Admin admin = new Admin();
+        admin.setUsername("admin");
+        admin.setPassword(
+                passwordEncoder.encode("admin@1234")
+        );
+
+        adminRepository.save(admin);
+
+        Doctor doctor = doctorRepository.save(aDoctor());
+        DoctorProfileUpdateDTO doctorToUpdate = new DoctorProfileUpdateDTO(
+                doctor.getId(),
+                "Dr. Updated",
+                "Cardiology",
+                "5551234567",
+                List.of(AvailableTime.SLOT_11_12, AvailableTime.SLOT_13_14)
+        );
+
+        mockMvc.perform(put(DOCTOR_API + "/" + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(doctorToUpdate)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Doctor updated successfully"));
+
+        Doctor updatedDoctor = doctorRepository.findById(doctor.getId()).orElseThrow();
+
+        assertEquals(doctorToUpdate.name(), updatedDoctor.getName());
+        assertEquals(doctorToUpdate.specialty(), updatedDoctor.getSpecialty());
+        assertEquals(doctorToUpdate.phone(), updatedDoctor.getPhone());
+        assertEquals(doctorToUpdate.availableTimes(), updatedDoctor.getAvailableTimes());
+    }
+
+    @Test
+    void shouldRejectUpdateDoctorOnDoctorNotFound() throws Exception {
+        Admin admin = new Admin();
+        admin.setUsername("admin");
+        admin.setPassword(
+                passwordEncoder.encode("admin@1234")
+        );
+
+        adminRepository.save(admin);
+
+        DoctorProfileUpdateDTO doctorToUpdate = new DoctorProfileUpdateDTO(
+                1000L,
+                "Dr. Updated",
+                "Cardiology",
+                "5551234567",
+                List.of(AvailableTime.SLOT_11_12, AvailableTime.SLOT_13_14)
+        );
+
+        mockMvc.perform(put(DOCTOR_API + "/" + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(doctorToUpdate)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Doctor Not Found"));
+    }
+
+    @Test
+    void shouldRejectUpdateDoctorWhenUserIsNotAdmin() throws Exception {
+        Doctor doctor = doctorRepository.save(aDoctor());
+        DoctorProfileUpdateDTO doctorToUpdate = new DoctorProfileUpdateDTO(
+                doctor.getId(),
+                "Dr. Updated",
+                "Cardiology",
+                "5551234567",
+                List.of(AvailableTime.SLOT_11_12, AvailableTime.SLOT_13_14)
+        );
+
+        String patientToken = getToken("patient@email.com", Role.PATIENT);
+        mockMvc.perform(put(DOCTOR_API + "/" + patientToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(doctorToUpdate)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Not allowed"));
+    }
+
+    @Test
+    void shouldRejectUpdateDoctorOnBadRequest() throws Exception {
+        Doctor existingDoctor = doctorRepository.save(aDoctor());
+
+        DoctorProfileUpdateDTO doctorToUpdate = new DoctorProfileUpdateDTO(
+                existingDoctor.getId(),
+                "",
+                "",
+                "55",
+                List.of(AvailableTime.SLOT_11_12, AvailableTime.SLOT_13_14)
+        );
+
+        mockMvc.perform(put(DOCTOR_API + "/" + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(doctorToUpdate)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").isNotEmpty())
+                .andExpect(jsonPath("$.errors.name").exists())
+                .andExpect(jsonPath("$.errors.specialty").exists())
+                .andExpect(jsonPath("$.errors.phone").exists());
+
+        Doctor notUpdatedDoctor = doctorRepository.findById(existingDoctor.getId()).orElseThrow();
+
+        assertEquals(existingDoctor.getName(), notUpdatedDoctor.getName());
+        assertEquals(existingDoctor.getSpecialty(), notUpdatedDoctor.getSpecialty());
+        assertEquals(existingDoctor.getPhone(), notUpdatedDoctor.getPhone());
+        assertIterableEquals(existingDoctor.getAvailableTimes(), notUpdatedDoctor.getAvailableTimes());
+    }
+
+    @Test
     void shouldDeleteADoctor() throws Exception {
+        Admin admin = new Admin();
+        admin.setUsername("admin");
+        admin.setPassword(
+                passwordEncoder.encode("admin@1234")
+        );
+
+        adminRepository.save(admin);
+
         Doctor doctor = new Doctor();
         doctor.setName("John Doe");
         doctor.setEmail("doctor@email.com");
@@ -268,7 +371,7 @@ public class DoctorControllerIntegrationTest {
 
         assertTrue(isDoctorSaved);
 
-        mockMvc.perform(delete(SAVE_DOCTORS_URI + "/" + savedDoctor.getId() + "/" + adminToken)
+        mockMvc.perform(delete(DOCTOR_API + "/" + savedDoctor.getId() + "/" + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -277,10 +380,18 @@ public class DoctorControllerIntegrationTest {
 
     @Test
     void shouldResponseGracefullyWhenDoctorDoesNotExist() throws Exception {
+        Admin admin = new Admin();
+        admin.setUsername("admin");
+        admin.setPassword(
+                passwordEncoder.encode("admin@1234")
+        );
+
+        adminRepository.save(admin);
+
 
         doctorRepository.deleteById(1L);
 
-        mockMvc.perform(delete(SAVE_DOCTORS_URI + "/1/" + adminToken)
+        mockMvc.perform(delete(DOCTOR_API + "/1/" + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -289,7 +400,7 @@ public class DoctorControllerIntegrationTest {
 
     @Test
     void shouldNotDeleteADoctorOnBadRequest() throws Exception {
-        mockMvc.perform(delete(SAVE_DOCTORS_URI + "/one/" + adminToken)
+        mockMvc.perform(delete(DOCTOR_API + "/one/" + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
@@ -307,8 +418,44 @@ public class DoctorControllerIntegrationTest {
 
         String doctorToken = tokenService.generateToken(doctorUser);
 
-        mockMvc.perform(delete(SAVE_DOCTORS_URI + "/1/" + doctorToken)
+        mockMvc.perform(delete(DOCTOR_API + "/1/" + doctorToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+    }
+
+    /* ---------------------------------------------- Helpers ---------------------------------------------- */
+
+    private Doctor aDoctor() {
+        Doctor doctor = new Doctor();
+        doctor.setName("John Doe");
+        doctor.setEmail("john.doe@email.com");
+        doctor.setPhone("5553334444");
+        doctor.setPassword(passwordEncoder.encode("john.doe@1234"));
+        doctor.setSpecialty("Neurologist");
+        doctor.setAvailableTimes(List.of(AvailableTime.SLOT_08_09, AvailableTime.SLOT_10_11));
+
+        return doctor;
+    }
+
+    private Doctor anotherDoctor() {
+        Doctor doctor = new Doctor();
+        doctor.setName("Jane Doe");
+        doctor.setEmail("jane.doe@email.com");
+        doctor.setPhone("1153334444");
+        doctor.setPassword(passwordEncoder.encode("jane.doe@1234"));
+        doctor.setSpecialty("Cardiologist");
+        doctor.setAvailableTimes(List.of(AvailableTime.SLOT_13_14, AvailableTime.SLOT_14_15));
+
+        return doctor;
+    }
+
+    private String getToken(String email, String role) {
+        UserDetails user = User.builder()
+                .username(email)
+                .password("test")
+                .roles(role.toUpperCase())
+                .build();
+
+        return tokenService.generateToken(user);
     }
 }
