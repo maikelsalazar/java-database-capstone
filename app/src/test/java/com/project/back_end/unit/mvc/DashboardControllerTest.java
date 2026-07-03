@@ -1,5 +1,6 @@
-package com.project.back_end.mvc;
+package com.project.back_end.unit.mvc;
 
+import com.project.back_end.mvc.DashboardController;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.Service;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,8 @@
-package com.project.back_end.controllers;
+package com.project.back_end.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.back_end.DTO.PrescriptionCreateDTO;
+import com.project.back_end.integration.shared.IntegrationTest;
 import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Patient;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class PrescriptionControllerIntegrationTest extends IntegrationTest {
+public class PrescriptionControllerIT extends IntegrationTest {
     private static final String PRESCRIPTION_API = "/api/prescription";
 
     @Autowired

@@ -1,4 +1,4 @@
-package com.project.back_end.dto;
+package com.project.back_end.unit.dto;
 
 import com.project.back_end.DTO.AppointmentDTO;
 import org.junit.jupiter.api.Test;

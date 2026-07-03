@@ -1,7 +1,8 @@
-package com.project.back_end.controllers;
+package com.project.back_end.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.back_end.DTO.DoctorProfileUpdateDTO;
+import com.project.back_end.integration.shared.IntegrationTest;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.models.Admin;
 import com.project.back_end.models.Doctor;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class DoctorControllerIntegrationTest extends IntegrationTest {
+public class DoctorControllerIT extends IntegrationTest {
     private static final String LOGIN_URI = "/api/doctor/login";
     private static final String DOCTOR_API = "/api/doctor/";
 

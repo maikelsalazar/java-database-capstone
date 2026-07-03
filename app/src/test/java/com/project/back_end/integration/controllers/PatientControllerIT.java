@@ -1,5 +1,6 @@
-package com.project.back_end.controllers;
+package com.project.back_end.integration.controllers;
 
+import com.project.back_end.integration.shared.IntegrationTest;
 import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Patient;
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class PatientControllerIntegrationTest extends IntegrationTest {
+public class PatientControllerIT extends IntegrationTest {
 
     private static final String PATIENT_API_URL = "/api/patient";
 

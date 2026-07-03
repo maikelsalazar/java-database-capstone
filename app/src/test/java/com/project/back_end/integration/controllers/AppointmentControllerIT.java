@@ -1,4 +1,4 @@
-package com.project.back_end.controllers;
+package com.project.back_end.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.back_end.DTO.AppointmentCreateDTO;
@@ -8,6 +8,7 @@ import com.project.back_end.DTO.PatientIdDTO;
 import com.project.back_end.builders.AppointmentBuilder;
 import com.project.back_end.builders.DoctorBuilder;
 import com.project.back_end.builders.PatientBuilder;
+import com.project.back_end.integration.shared.IntegrationTest;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
@@ -17,6 +18,7 @@ import com.project.back_end.services.TokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class AppointmentControllerIntegrationTests extends IntegrationTest {
+public class AppointmentControllerIT extends IntegrationTest {
 
     private static final String APPOINTMENTS_API = "/api/appointments";
     private static final List<AvailableTime> AVAILABLE_TIMES = List.of(

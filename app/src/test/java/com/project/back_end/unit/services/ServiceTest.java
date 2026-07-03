@@ -1,5 +1,8 @@
-package com.project.back_end.services;
+package com.project.back_end.unit.services;
 
+import com.project.back_end.services.DoctorService;
+import com.project.back_end.services.Service;
+import com.project.back_end.services.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,7 +22,8 @@ public class ServiceTest {
     @Mock
     private DoctorService doctorService;
 
-    @Mock TokenService tokenService;
+    @Mock
+    TokenService tokenService;
 
     @InjectMocks
     private Service service;

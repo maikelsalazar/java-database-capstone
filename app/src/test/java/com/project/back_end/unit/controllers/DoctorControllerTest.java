@@ -1,6 +1,7 @@
-package com.project.back_end.controllers;
+package com.project.back_end.unit.controllers;
 
 import com.project.back_end.DTO.DoctorDTO;
+import com.project.back_end.controllers.DoctorController;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ActiveProfiles("test")
 @WebMvcTest(controllers = DoctorController.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class DoctorControllerTest {

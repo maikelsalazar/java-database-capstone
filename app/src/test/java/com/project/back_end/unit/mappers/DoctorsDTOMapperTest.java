@@ -1,9 +1,11 @@
-package com.project.back_end.mappers;
+package com.project.back_end.unit.mappers;
 
 import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.enums.AvailableTime;
+import com.project.back_end.mappers.DoctorMapper;
 import com.project.back_end.models.Doctor;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 

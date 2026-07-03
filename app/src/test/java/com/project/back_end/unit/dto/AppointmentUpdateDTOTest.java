@@ -1,4 +1,4 @@
-package com.project.back_end.dto;
+package com.project.back_end.unit.dto;
 
 import com.project.back_end.DTO.AppointmentUpdateDTO;
 import com.project.back_end.DTO.DoctorIdDTO;
@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

@@ -1,10 +1,12 @@
-package com.project.back_end.mappers;
+package com.project.back_end.unit.mappers;
 
 import com.project.back_end.DTO.AppointmentDTO;
+import com.project.back_end.mappers.AppointmentMapper;
 import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Patient;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.List;

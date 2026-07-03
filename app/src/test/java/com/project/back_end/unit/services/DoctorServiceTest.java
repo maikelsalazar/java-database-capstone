@@ -1,10 +1,12 @@
-package com.project.back_end.services;
+package com.project.back_end.unit.services;
 
 import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.repo.AppointmentRepository;
 import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.services.DoctorService;
+import com.project.back_end.services.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

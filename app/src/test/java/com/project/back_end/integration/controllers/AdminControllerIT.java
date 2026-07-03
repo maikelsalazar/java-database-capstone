@@ -1,5 +1,6 @@
-package com.project.back_end.controllers;
+package com.project.back_end.integration.controllers;
 
+import com.project.back_end.integration.shared.IntegrationTest;
 import com.project.back_end.models.Admin;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class AdminControllerIntegrationTest extends IntegrationTest {
+public class AdminControllerIT extends IntegrationTest {
 
     private static final String LOGIN_URI = "/api/admin/login";
 
