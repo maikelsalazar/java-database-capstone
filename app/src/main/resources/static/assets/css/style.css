@@ -261,6 +261,23 @@
     padding: 0;
   }
 
+  .doctor-card .top {
+    text-align: right;
+    margin: 0;
+  }
+
+  .doctor-card button.edit {
+    border-radius: 0 0 0 10px;
+    border: 1px solid #DDD;
+    width: auto;
+    background: transparent;
+  }
+
+  .doctor-card button.edit:hover {
+    background: #015c5d;
+    transform: scale(1.02);
+  }
+
   .doctor-card:hover {
     transform: scale(1.02);
   }
@@ -271,7 +288,7 @@
   }
 
   .doctor-info h3 {
-    margin-top: 30px;
+    margin-top: 10px;
     font-size: 24px;
     color: #015c5d;
   }

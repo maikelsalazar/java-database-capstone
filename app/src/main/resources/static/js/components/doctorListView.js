@@ -67,8 +67,8 @@ function resetFilterForm() {
   const { filterByName, filterTime, filterSpecialty } = doctorView;
 
   if(filterByName) filterByName.value = "";
-  if(filterTime) filterTime.value = "";
-  if(filterSpecialty) filterSpecialty.value = "";
+  if(filterTime) filterTime.value = "*";
+  if(filterSpecialty) filterSpecialty.value = "*";
 }
 
 function loadDoctorCards() {
@@ -80,8 +80,8 @@ function loadDoctorCards() {
 
 function filterDoctorsOnChange() {
   const name = doctorView.filterByName?.value.trim() ?? "";
-  const time = doctorView.filterTime?.value ?? "";
-  const specialty = doctorView.filterSpecialty?.value ?? "";
+  const time = doctorView.filterTime?.value ?? "*";
+  const specialty = doctorView.filterSpecialty?.value ?? "*";
 
   return renderDoctorCards(
     filterDoctors(name, time, specialty),

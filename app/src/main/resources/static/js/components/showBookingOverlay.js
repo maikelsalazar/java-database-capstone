@@ -3,8 +3,6 @@ import { bookAppointment } from '../services/appointmentRecordService.js';
 export function showBookingOverlay(e, doctor, patient) {
   const button = e.target;
   const rect = button.getBoundingClientRect();
-  console.log(patient.name)
-  console.log(patient)
   const ripple = document.createElement("div");
   ripple.classList.add("ripple-overlay");
   ripple.style.left = `${e.clientX}px`;
@@ -73,9 +71,7 @@ export function showBookingOverlay(e, doctor, patient) {
     console.log(result);
 
     if (!result.success) {
-
       const entries = Object.entries(result?.errors ?? {});
-
       if (entries.length > 0) {
         document.getElementById("globalErrorMessage").textContent = "Validation errors";
         entries.forEach(([field, message]) => {

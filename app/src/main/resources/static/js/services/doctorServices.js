@@ -87,6 +87,54 @@ export async function saveDoctor(name, specialty, email, password, phone, availa
     }
 };
 
+export async function updateDoctor(doctor) {
+  const token = localStorage.getItem("token");
+
+  try {
+      const response = await fetch(`${DOCTOR_API}/${token}`, {
+        method: "PUT",
+        headers: {
+         "Content-Type": "application/json"
+        },
+        body: JSON.stringify(doctor),
+      });
+
+      if (!response.ok) {
+          switch(response.status) {
+              case 400:
+                  const { errors } = await response.json();
+
+                  return {
+                    success: false,
+                    message: "Validation fails",
+                    errors: errors,
+                  };
+
+              case 401:
+                  throw new Error("Forbidden");
+
+              default:
+                  throw new Error("Unknown Error");
+          }
+      }
+
+      return {
+        success: true,
+        message: "",
+        errors: {}
+      };
+  } catch(error) {
+     return {
+      success: false,
+      message:
+        error instanceof TypeError
+        ? "Cannot connect to server"
+        : error.message,
+      errors: {}
+     };
+  }
+}
+
 export async function deleteDoctor(id) {
     const token = localStorage.getItem("token");
 

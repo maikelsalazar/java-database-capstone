@@ -1,5 +1,5 @@
 import { loadDoctorCards, resetFilterForm } from './doctorListView.js';
-import { saveDoctor, deleteDoctor } from '../services/doctorServices.js';
+import { saveDoctor, updateDoctor, deleteDoctor } from '../services/doctorServices.js';
 
 export async function addDoctorHandler() {
   document.querySelectorAll("[id$='Message']").forEach(elem => {
@@ -22,7 +22,7 @@ export async function addDoctorHandler() {
       !specialty ||
       !email ||
       !password ||
-      !phone||
+      !phone ||
       availabilityTimes.length === 0
     ) {
     globalErrorMessage.textContent = "All fields are required";
@@ -61,8 +61,42 @@ export async function addDoctorHandler() {
   }, 3000);
 };
 
-export function updateDoctorHandler() {
-  alert("Update Doctor " + this.dataset.id);
+export async function updateDoctorHandler() {
+  const id = this.dataset.id;
+  const name = document.getElementById("doctorName").value.trim();
+  const specialty = document.getElementById("specialty").value.trim();
+  const phone = document.getElementById("doctorPhone").value.trim();
+  const availableTimes = Array.from(
+    document.querySelectorAll('input[name="availability"]:checked')
+  ).map(checkbox => checkbox.value);
+
+
+  const doctorToUpdate = { id, name, specialty, phone, availableTimes };
+  const globalErrorMessage = document.getElementById("globalErrorMessage");
+
+  const result = await updateDoctor(doctorToUpdate);
+
+  if (!result.success) {
+    globalErrorMessage.textContent = result.message;
+
+    Object.entries(result.errors).forEach(([field, message]) => {
+      const fieldMessage = document.getElementById(`${field}Message`);
+      if (fieldMessage) {
+        fieldMessage.textContent = `${field}: ${message}`;
+      }
+    });
+
+    return;
+  }
+
+  document.getElementById('modal-body').innerHTML = "<p class='success'>Doctor updated successfully</p>";
+
+  resetFilterForm();
+  loadDoctorCards();
+
+  setTimeout(() => {
+      document.getElementById("modal").style.display = "none";
+  }, 3000);
 };
 
 export async function deleteDoctorHandler() {

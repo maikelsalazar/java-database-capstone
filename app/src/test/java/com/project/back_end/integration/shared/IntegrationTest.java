@@ -13,7 +13,6 @@ import org.springframework.test.context.DynamicPropertySource;
 @ActiveProfiles("test")
 public abstract class IntegrationTest {
 
-
     @DynamicPropertySource
     static void props(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", TestContainersConfig.MYSQL::getJdbcUrl);
@@ -40,23 +39,10 @@ public abstract class IntegrationTest {
 
     @BeforeEach
     void cleanDatabase() {
-        System.out.println("Cleaning DB START");
-
         appointmentRepository.deleteAll();
-        System.out.println("appointments");
-
         prescriptionRepository.deleteAll();
-        System.out.println("prescriptions");
-
         doctorRepository.deleteAll();
-        System.out.println("doctors");
-
         patientRepository.deleteAll();
-        System.out.println("patients");
-
         adminRepository.deleteAll();
-        System.out.println("admins");
-
-        System.out.println("Cleaning DB END");
     }
 }
