@@ -1,0 +1,25 @@
+name: Test Java Backend
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-backend:
+    name: Run Backend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Run unit and integration tests
+        working-directory: app
+        run: mvn clean verify -B
