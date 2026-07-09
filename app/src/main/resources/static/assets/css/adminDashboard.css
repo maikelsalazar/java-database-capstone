@@ -37,7 +37,7 @@ button {
   border: none;
   border-radius: 12px;
   padding: 10px 20px;
-  margin-top: 0px;
+  margin-top: 0;
   width: auto;
   cursor: pointer;
   font-size: 16px;
@@ -56,9 +56,8 @@ button:hover {
   background-color:transparent;
   color: #333;
   font-weight: bold;
-
   width: auto;
-  padding: 0px 12px;
+  padding: 0 12px;
   cursor: pointer;
 }
 

@@ -1,8 +1,8 @@
 import { bookAppointment } from '../services/appointmentRecordService.js';
 
 export function showBookingOverlay(e, doctor, patient) {
-  const button = e.target;
-  const rect = button.getBoundingClientRect();
+  // const button = e.target;
+  // const rect = button.getBoundingClientRect();
   const ripple = document.createElement("div");
   ripple.classList.add("ripple-overlay");
   ripple.style.left = `${e.clientX}px`;
@@ -63,7 +63,7 @@ export function showBookingOverlay(e, doctor, patient) {
     const appointment = {
         doctor: { id: doctor.id },
         patient: { id: patient.id },
-        appointmentTime: `${date}T${startTime}:00`,
+        appointmentTime: appointmentTime,
         status: 0
     };
 

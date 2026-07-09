@@ -4,7 +4,7 @@ import { APPOINTMENT_API } from "../config/config.js";
 //This is for the doctor to get all the patient Appointments
 export async function getAllAppointments(date, patientName, token) {
   const hasPatientName =
-      patientName != null && patientName.trim() !== "";
+      patientName !== null && patientName.trim() !== "";
 
   const url = hasPatientName
     ? `${APPOINTMENT_API}/${date}/search/${encodeURIComponent(patientName)}/${token}`

@@ -1,6 +1,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html, body { height: 100%; font-family: 'Roboto', sans-serif; }
+html, body { height: 100%; font-family: Roboto, sans-serif; }
 
 .wrapper {
   display: flex;
@@ -14,7 +14,7 @@ h2 {
   margin-bottom: 50px;
   color: #003e3e;
   font-weight: bold;
-  font-family: 'Alegreya', 'Roboto', sans-serif;
+  font-family: Alegreya, Roboto, sans-serif;
   text-align: center;
 }
 
@@ -26,7 +26,6 @@ h2 {
   justify-content: center;
   align-items: center;
   text-align: center;
-
   background-image: url('../images/defineRole/index.png');
   background-size: cover;
   background-position: center;

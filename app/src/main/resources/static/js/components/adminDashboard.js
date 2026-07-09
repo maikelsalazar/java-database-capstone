@@ -29,7 +29,7 @@ export async function adminAddDoctor() {
     document.querySelectorAll('input[name="availability"]:checked')
   ).map(checkbox => checkbox.value);
 
-  if (name == "" || specialty == "" || email == "" || password == "" || phone == "" || availabilityTimes.length == 0) {
+  if (name === "" || specialty === "" || email === "" || password === "" || phone === "" || availabilityTimes.length === 0) {
       const globalErrorMessage = document.getElementById("globalErrorMessage");
       globalErrorMessage.textContent = "All fields are required";
       return;

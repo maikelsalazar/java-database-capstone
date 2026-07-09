@@ -1,0 +1,17 @@
+{
+  "type": "module",
+  "scripts": {
+    "lint:html": "htmlhint \"app/src/main/resources/static/**/*.html\"",
+    "lint:css": "stylelint \"app/src/main/resources/static/assets/css/**/*.css\"",
+    "lint:js": "eslint \"app/src/main/resources/static/js/**/*.js\"",
+    "lint": "npm run lint:html && npm run lint:css && npm run lint:js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "htmlhint": "^1.9.2",
+    "stylelint": "^17.14.0",
+    "stylelint-config-standard": "^40.0.0"
+  }
+}

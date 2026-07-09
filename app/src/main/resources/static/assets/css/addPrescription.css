@@ -7,7 +7,7 @@
     margin: 50px auto;
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
     animation: fadeIn 0.5s ease-in-out;
   }
 
@@ -41,7 +41,7 @@
     font-size: 15px;
     outline: none;
     transition: 0.3s;
-    font-family: "Verdana";
+    font-family: Verdana;
   }
 
   input:focus, textarea:focus {
@@ -53,6 +53,7 @@
   #patientName{
     background-color: #bdbcbc80;
   }
+
   .btn-primary {
     background-color: #047857;
     color: #fff;

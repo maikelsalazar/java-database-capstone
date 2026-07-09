@@ -13,13 +13,13 @@ document.addEventListener("DOMContentLoaded", initializePage);
 
 async function initializePage() {
   try {
-    if (!token) throw new Error("No token found");
+    if (!token) { throw new Error("No token found"); }
 
     const appointmentData = await getPatientAppointments(patientId, token, "doctor") || [];
 
     // Filter by both patientId and doctorId
     const filteredAppointments = appointmentData.filter(app =>
-      app.doctorId == doctorId);
+      app.doctorId === doctorId);
     console.log(filteredAppointments)
     renderAppointments(filteredAppointments);
   } catch (error) {

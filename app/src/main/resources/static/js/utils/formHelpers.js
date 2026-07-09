@@ -22,7 +22,9 @@ function clearMessages() {
  * }
  */
 function showMessages(response) {
-  if (!response || response.success) return;
+  if (!response || response.success) {
+    return
+  };
 
   if (response.message) {
     showFieldMessage("globalErrorMessage", response.message);
