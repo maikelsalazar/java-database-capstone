@@ -1,3 +1,40 @@
+# User Stories
+
+## Public
+
+### Select Role (Index Page)
+_As a user, I want to view and select the available system roles (Admin, Patient, Doctor),
+so that I can access the appropriate section of the system._
+
+**Feature (Gherkin)**
+```gherkin
+Feature: Select system role
+Scenario: View available roles on the index page
+  Given I have access to the system
+  When the index page loads
+  Then I should see the available system roles
+  And I should see a clickable "Admin" role option
+  And I should see a clickable "Patient" role option
+  And I should see a clickable "Doctor" role option
+```
+
+**Acceptance Criteria:**
+1. The index page must be publicly accessible
+2. The index page must load without authentication
+3. The index page must be the default application entry point
+4. I should see the "Admin" role option.
+5. I should see the "Patient" role option.
+6. I should see the "Doctor" role option.
+7. Each role option must be presented as a clickable button or link.
+
+**Priority:** High
+**Story Points:** 2
+**Notes:**
+- The index page acts as the public entry point of the system.
+- Each role must include a clickable button or link.
+
+---
+
 ## Admin User Stories
 
 ### Login As Admin
@@ -591,7 +628,7 @@ Scenario: Cancel to add a prescription
 **Notes:**
 - A doctor must not be able to add prescriptions to another doctor's appointments.
 
-## Patient's User Stories
+## Patient User Stories
 
 ### Patient Dashboard As Guest
 _As a Patient, I want to access a public dashboard where I can view available doctors and choose to log in or sign up, so that I can decide how to proceed._
@@ -1096,36 +1133,3 @@ Scenario: No doctors match filters
    **Story Points:** 3
    **Notes:**
 - The endpoint is public and reusable by multiple consumers (admin, patient, guest dashboards).
-
-## Public
-
-### Select Role (Index Page)
-_As a user, I want to view and select the available system roles (Admin, Patient, Doctor),
-so that I can access the appropriate section of the system._
-
-**Feature (Gherkin)**
-```gherkin
-Feature: Select system role
-Scenario: View available roles on the index page
-  Given I have access to the system
-  When the index page loads
-  Then I should see the available system roles
-  And I should see a clickable "Admin" role option
-  And I should see a clickable "Patient" role option
-  And I should see a clickable "Doctor" role option
-```
-
-**Acceptance Criteria:**
-1. The index page must be publicly accessible
-2. The index page must load without authentication
-3. The index page must be the default application entry point
-4. I should see the "Admin" role option.
-5. I should see the "Patient" role option.
-6. I should see the "Doctor" role option.
-7. Each role option must be presented as a clickable button or link.
-
-**Priority:** High
-**Story Points:** 2
-**Notes:**
-- The index page acts as the public entry point of the system.
-- Each role must include a clickable button or link.
