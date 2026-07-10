@@ -20,6 +20,10 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Compile with Maven
+      - name: Grant execute permission for Maven Wrapper
         working-directory: app
-        run: mvn clean compile
+        run: chmod +x mvnw
+
+      - name: Compile with Maven Wrapper
+        working-directory: app
+        run: ./mvnw clean compile
