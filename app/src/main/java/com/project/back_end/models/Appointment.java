@@ -1,6 +1,8 @@
 package com.project.back_end.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,7 +10,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "appointment", indexes = {
-        @Index(name = "idx_doctor_time", columnList = "doctor_id,appointmentTime", unique = true)
+        @Index(name = "idx_doctor_time", columnList = "doctor_id,appointment_time", unique = true)
 })
 public class Appointment {
 
@@ -20,19 +22,33 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Doctor is required")
     @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
+    @NotNull(message = "Patient is required")
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
+    @NotNull(message = "Appointment time is required")
+    @Future(message = "Appointment time must be in the future")
     @Column(nullable = false)
     private LocalDateTime appointmentTime;
 
     @Column(nullable = false)
     private int status; // 0=scheduled, 1=completed, 2=cancelled
+
+    public Appointment() {
+    }
+
+    public Appointment(Doctor doctor, Patient patient, LocalDateTime appointmentTime, int status) {
+        this.doctor = doctor;
+        this.patient = patient;
+        this.appointmentTime = appointmentTime;
+        this.status = status;
+    }
 
     public Long getId() {
         return id;
@@ -87,7 +103,6 @@ public class Appointment {
     }
 
     public boolean isScheduled() {
-        return status == this.STATUS_SCHEDULED;
+        return status == STATUS_SCHEDULED;
     }
 }
-

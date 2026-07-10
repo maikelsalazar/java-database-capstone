@@ -3,6 +3,7 @@ package com.project.back_end.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.back_end.enums.AvailableTime;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,24 +16,33 @@ public class Doctor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Doctor's name cannot be null or blank")
+    @Size(min = 3, max = 100)
     @Column(nullable = false, length = 100)
     private String name; // Doctor's full name
 
+    @NotBlank(message = "Doctor's specialty cannot be null or blank")
+    @Size(min = 3, max = 50)
     @Column(nullable = false, length = 50)
     private String specialty;
 
+    @Email(message = "Doctor's email must be a valid email address")
     @Column(nullable = false, length = 100, unique = true)
     private String email;
 
+    @NotBlank(message = "Doctor's password is required")
+    @Size(min = 8, max = 15)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, length = 100)
     private String password;
 
+    @NotNull(message = "Doctor's phone number is required")
+    @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
     @Column(nullable = false, length = 15)
     private String phone;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<AvailableTime> availableTimes;
+    private List<AvailableTime> availableTimes = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "doctor",
@@ -42,6 +52,16 @@ public class Doctor {
     private List<Appointment> appointments = new ArrayList<>();
 
     public Doctor() {
+    }
+
+    public Doctor(String name, String specialty, String email, String password, String phone, List<AvailableTime> availableTimes, List<Appointment> appointments) {
+        this.name = name;
+        this.specialty = specialty;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.availableTimes = availableTimes;
+        this.appointments = appointments;
     }
 
     public Long getId() {
