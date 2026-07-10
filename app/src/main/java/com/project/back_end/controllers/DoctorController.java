@@ -8,6 +8,7 @@ import com.project.back_end.DTO.response.ApiDataResponseDTO;
 import com.project.back_end.DTO.response.ApiResponseDTO;
 import com.project.back_end.DTO.response.LoginResponseDTO;
 import com.project.back_end.DTO.response.ResponseKeys;
+import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -92,5 +94,26 @@ public class DoctorController {
         doctorService.deleteDoctor(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/availability/{role}/{doctorId}/{date}/{token}")
+    public ResponseEntity<ApiDataResponseDTO> getDoctorAvailability(
+            @PathVariable String role,
+            @PathVariable Long doctorId,
+            @PathVariable LocalDate date,
+            @PathVariable String token
+    ) {
+
+        service.validateTokenOrThrow(token, role.toUpperCase());
+
+        List<AvailableTime> availableTimes =
+                doctorService.getAvailableTimes(doctorId, date);
+
+        return ResponseEntity.ok(
+                ApiDataResponseDTO.of(
+                        ResponseKeys.AVAILABLE_TIMES,
+                        availableTimes
+                )
+        );
     }
 }

@@ -31,7 +31,7 @@ public class Doctor {
     private String email;
 
     @NotBlank(message = "Doctor's password is required")
-    @Size(min = 8, max = 15)
+    @Size(min = 8, max = 100)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, length = 100)
     private String password;

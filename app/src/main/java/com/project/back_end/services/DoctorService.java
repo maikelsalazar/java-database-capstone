@@ -3,25 +3,35 @@ package com.project.back_end.services;
 import com.project.back_end.DTO.DoctorCreateDTO;
 import com.project.back_end.DTO.DoctorDTO;
 import com.project.back_end.DTO.DoctorProfileUpdateDTO;
+import com.project.back_end.enums.AvailableTime;
 import com.project.back_end.exceptions.DoctorNotFoundException;
 import com.project.back_end.exceptions.DuplicateEmailException;
 import com.project.back_end.mappers.DoctorMapper;
+import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
+import com.project.back_end.repo.AppointmentRepository;
 import com.project.back_end.repo.DoctorRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class DoctorService {
 
     private final DoctorRepository doctorRepository;
+    private final AppointmentRepository appointmentRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DoctorService(DoctorRepository doctorRepository, PasswordEncoder passwordEncoder) {
+    public DoctorService(DoctorRepository doctorRepository, AppointmentRepository appointmentRepository, PasswordEncoder passwordEncoder) {
         this.doctorRepository = doctorRepository;
+        this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -114,5 +124,28 @@ public class DoctorService {
         List<Doctor> doctorList = doctorRepository.findByNameAndTimeAndSpecialty(name, time, specialty);
 
         return DoctorMapper.toDTOList(doctorList, time);
+    }
+
+    public List<AvailableTime> getAvailableTimes(Long doctorId, LocalDate date) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(DoctorNotFoundException::new);
+
+        List<AvailableTime> doctorAvailableTimes = new ArrayList<>(
+                doctor.getAvailableTimes()
+        );
+
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+
+        List<Appointment> appointments =
+                appointmentRepository.findByDoctorIdAndAppointmentTimeBetween(doctorId, start, end);
+
+        Set<AvailableTime> bookedTimes = appointments.stream()
+                .map(appointment -> AvailableTime.fromStartTime(appointment.getAppointmentTime()))
+                .collect(Collectors.toSet());
+
+        doctorAvailableTimes.removeAll(bookedTimes);
+
+        return doctorAvailableTimes;
     }
 }
