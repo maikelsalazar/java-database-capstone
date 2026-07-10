@@ -9,9 +9,11 @@ import com.project.back_end.DTO.response.ApiResponseDTO;
 import com.project.back_end.DTO.response.LoginResponseDTO;
 import com.project.back_end.DTO.response.ResponseKeys;
 import com.project.back_end.enums.AvailableTime;
+import com.project.back_end.models.Doctor;
 import com.project.back_end.security.Role;
 import com.project.back_end.services.DoctorService;
 import com.project.back_end.services.Service;
+import com.project.back_end.services.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +30,12 @@ public class DoctorController {
 
     private final Service service;
 
-    public DoctorController(DoctorService doctorService, Service service) {
+    private final TokenService tokenService;
+
+    public DoctorController(DoctorService doctorService, Service service, TokenService tokenService) {
         this.doctorService = doctorService;
         this.service = service;
+        this.tokenService = tokenService;
     }
 
     @GetMapping("/list")
@@ -52,13 +57,15 @@ public class DoctorController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> doctorLogin(@Valid @RequestBody EmailLoginDTO loginRequest) {
-        String token = service.validateDoctor(loginRequest);
+        Doctor doctor = doctorService.validateDoctor(loginRequest.email(), loginRequest.password());
 
-        if (token == null) {
+        if (doctor == null) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(LoginResponseDTO.failure());
         }
+
+        String token = tokenService.generateToken(doctor.getEmail());
 
         return ResponseEntity.ok(LoginResponseDTO.success(token));
     }
@@ -107,7 +114,7 @@ public class DoctorController {
         service.validateTokenOrThrow(token, role.toUpperCase());
 
         List<AvailableTime> availableTimes =
-                doctorService.getAvailableTimes(doctorId, date);
+                doctorService.getDoctorAvailability(doctorId, date);
 
         return ResponseEntity.ok(
                 ApiDataResponseDTO.of(

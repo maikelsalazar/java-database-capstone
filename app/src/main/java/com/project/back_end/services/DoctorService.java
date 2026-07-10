@@ -11,6 +11,7 @@ import com.project.back_end.models.Appointment;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.repo.AppointmentRepository;
 import com.project.back_end.repo.DoctorRepository;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,10 +34,6 @@ public class DoctorService {
         this.doctorRepository = doctorRepository;
         this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    public void getDoctorAvailability() {
-        throw new UnsupportedOperationException("No implemented yet");
     }
 
     @Transactional
@@ -73,8 +70,19 @@ public class DoctorService {
         doctorRepository.deleteById(id);
     }
 
-    public void validateDoctor() {
-        throw new UnsupportedOperationException("No implemented yet");
+    public Doctor validateDoctor(String email, String password) {
+
+        Doctor doctor = doctorRepository.findByEmail(email);
+
+        if (doctor == null) {
+            return null;
+        }
+
+        if (!passwordEncoder.matches(password, doctor.getPassword())) {
+            return null;
+        }
+
+        return doctor;
     }
 
     @Transactional
@@ -126,7 +134,7 @@ public class DoctorService {
         return DoctorMapper.toDTOList(doctorList, time);
     }
 
-    public List<AvailableTime> getAvailableTimes(Long doctorId, LocalDate date) {
+    public List<AvailableTime> getDoctorAvailability(Long doctorId, LocalDate date) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(DoctorNotFoundException::new);
 

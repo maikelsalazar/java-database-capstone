@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -22,7 +21,7 @@ public class TokenService {
     @Value(("${jwt.secret}"))
     private String secret;
 
-    private final Long EXPIRATION_DATE = System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7;
+    private static final long EXPIRATION_DATE = 1000L * 60 * 60 * 24 * 7;
 
     @Autowired
     private AdminRepository adminRepository;
@@ -38,12 +37,21 @@ public class TokenService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public String generateToken(String email) {
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_DATE))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public String generateToken(UserDetails user) {
         return Jwts.builder()
                 .subject(user.getUsername())
                 .claim("role", user.getAuthorities().iterator().next().getAuthority())
                 .issuedAt(new Date())
-                .expiration(new Date(EXPIRATION_DATE))
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_DATE))
                 .signWith(getSigningKey())
                 .compact();
     }
